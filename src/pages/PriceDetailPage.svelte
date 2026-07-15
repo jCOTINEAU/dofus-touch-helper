@@ -1,0 +1,10 @@
+<script lang="ts">
+  let { itemId }: { itemId: string } = $props()
+</script>
+
+<h1 class="text-2xl font-bold mb-4">Prix — item {itemId}</h1>
+<div class="card bg-base-100 shadow-sm">
+  <div class="card-body">
+    <p class="text-base-content/60">À venir…</p>
+  </div>
+</div>

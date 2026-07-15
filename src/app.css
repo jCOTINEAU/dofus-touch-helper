@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+@plugin "daisyui";
+
+/* Safe areas iOS (encoche / barre home) pour navbar et dock */
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
