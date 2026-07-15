@@ -30,17 +30,23 @@
     {#if route.name === 'projets'}
       <ProjectsPage />
     {:else if route.name === 'projet'}
-      <ProjectDetailPage projectId={route.params.id} />
+      {#key route.params.id}
+        <ProjectDetailPage projectId={route.params.id} />
+      {/key}
     {:else if route.name === 'courses'}
       <ShoppingListPage />
     {:else if route.name === 'prix'}
       <PricesPage />
     {:else if route.name === 'prixDetail'}
-      <PriceDetailPage itemId={route.params.itemId} />
+      {#key route.params.itemId}
+        <PriceDetailPage itemId={route.params.itemId} />
+      {/key}
     {:else if route.name === 'combats'}
       <CombatsPage />
     {:else if route.name === 'combatDetail'}
-      <CombatDetailPage combatId={route.params.id} />
+      {#key route.params.id}
+        <CombatDetailPage combatId={route.params.id} />
+      {/key}
     {:else if route.name === 'reglages'}
       <SettingsPage />
     {:else if route.name === 'debug'}
