@@ -9,6 +9,7 @@
   import CombatDetailPage from './pages/CombatDetailPage.svelte'
   import SettingsPage from './pages/SettingsPage.svelte'
   import DebugPage from './pages/DebugPage.svelte'
+  import { swUpdate } from './lib/stores/swUpdate.svelte'
 
   const route = $derived(router.route)
 
@@ -53,6 +54,16 @@
       <DebugPage />
     {/if}
   </main>
+
+  {#if swUpdate.needRefresh}
+    <div class="toast toast-center z-50" style="bottom: 6rem">
+      <div class="alert alert-info">
+        <span>Nouvelle version disponible.</span>
+        <button class="btn btn-sm btn-primary" onclick={() => swUpdate.reload()}>Recharger</button>
+        <button class="btn btn-sm btn-ghost" onclick={() => swUpdate.dismiss()}>Plus tard</button>
+      </div>
+    </div>
+  {/if}
 
   <nav class="dock dock-lg bg-base-100 pb-safe">
     {#each navItems as item (item.name)}
