@@ -8,6 +8,7 @@
   import CombatsPage from './pages/CombatsPage.svelte'
   import CombatDetailPage from './pages/CombatDetailPage.svelte'
   import SettingsPage from './pages/SettingsPage.svelte'
+  import DebugPage from './pages/DebugPage.svelte'
 
   const route = $derived(router.route)
 
@@ -42,6 +43,8 @@
       <CombatDetailPage combatId={route.params.id} />
     {:else if route.name === 'reglages'}
       <SettingsPage />
+    {:else if route.name === 'debug'}
+      <DebugPage />
     {/if}
   </main>
 

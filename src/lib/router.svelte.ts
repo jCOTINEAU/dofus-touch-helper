@@ -17,6 +17,7 @@ const patterns: { pattern: string; name: string }[] = [
   { pattern: 'combats', name: 'combats' },
   { pattern: 'combats/:id', name: 'combatDetail' },
   { pattern: 'reglages', name: 'reglages' },
+  { pattern: 'debug', name: 'debug' },
 ]
 
 function parseHash(hash: string): Route {
