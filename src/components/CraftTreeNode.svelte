@@ -6,17 +6,30 @@
   import type { DisplayNode } from '../lib/needs/tree'
   import type { NodeNeed } from '../lib/needs/needs'
   import type { CachedItem } from '../lib/types'
+  import type { EffectiveCost } from '../lib/prices/costs'
+  import { formatKamas } from '../lib/prices/format'
 
   interface Props {
     node: DisplayNode
     depth?: number
     items: Map<number, CachedItem>
     needs: Map<number, NodeNeed>
+    /** Coût effectif crafter/acheter (optionnel — masqué si absent). */
+    costOf?: (itemId: number) => EffectiveCost
     onModeChange: (itemId: number, mode: 'craft' | 'buy') => void
     onOwnedChange: (itemId: number, owned: number) => void
     onCraft: (itemId: number) => void
   }
-  let { node, depth = 0, items, needs, onModeChange, onOwnedChange, onCraft }: Props = $props()
+  let {
+    node,
+    depth = 0,
+    items,
+    needs,
+    costOf,
+    onModeChange,
+    onOwnedChange,
+    onCraft,
+  }: Props = $props()
 
   const item = $derived(items.get(node.itemId))
   const need = $derived(needs.get(node.itemId))
@@ -47,6 +60,22 @@
   const remainingLabel = $derived.by(() => {
     if (!inPlan || done) return ''
     return expanded ? `reste ${need!.remaining} à crafter` : `reste ${need!.remaining} à obtenir`
+  })
+
+  // Aide à la décision : coût unitaire crafter vs acheter (si prix connus).
+  const cost = $derived(craftable && inPlan && !dead && costOf ? costOf(node.itemId) : null)
+  const costHint = $derived.by(() => {
+    if (!cost || (cost.craft === null && cost.buy === null)) return null
+    const parts: { label: string; value: string; best: boolean }[] = []
+    if (cost.craft !== null)
+      parts.push({
+        label: 'crafter',
+        value: formatKamas(cost.craft),
+        best: cost.bestSource === 'craft',
+      })
+    if (cost.buy !== null)
+      parts.push({ label: 'acheter', value: formatKamas(cost.buy), best: cost.bestSource === 'buy' })
+    return parts
   })
 </script>
 
@@ -123,6 +152,19 @@
             {:else if inPlan}
               <span class="text-xs text-base-content/45">matière première</span>
             {/if}
+            {#if costHint}
+              <span class="text-xs whitespace-nowrap text-base-content/60">
+                {#each costHint as part, i (part.label)}
+                  {#if i > 0}<span class="text-base-content/30"> · </span>{/if}
+                  <span class={part.best ? 'font-semibold text-accent' : ''}>
+                    {part.label} ≈ {part.value}{part.best && costHint.length > 1 ? ' ✓' : ''}
+                  </span>
+                {/each}
+                {#if cost && cost.missingPrices.length > 0}
+                  <span class="text-base-content/35">(partiel)</span>
+                {/if}
+              </span>
+            {/if}
           </div>
         </div>
       {/snippet}
@@ -193,6 +235,7 @@
           depth={depth + 1}
           {items}
           {needs}
+          {costOf}
           {onModeChange}
           {onOwnedChange}
           {onCraft}

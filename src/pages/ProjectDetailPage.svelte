@@ -6,8 +6,12 @@
   import { applyCraft } from '../lib/needs/craft'
   import { buildDisplayTree } from '../lib/needs/tree'
   import { expandCraftTree, type ExpandProgress } from '../lib/fetch/expand'
+  import { recentMedianUnit } from '../lib/prices/stats'
+  import { costShopping, effectiveCost, type EffectiveCost } from '../lib/prices/costs'
+  import { formatKamas } from '../lib/prices/format'
   import type { Project } from '../lib/types'
   import AddTargetForm from '../components/AddTargetForm.svelte'
+  import QtyStepper from '../components/QtyStepper.svelte'
   import CraftTreeNode from '../components/CraftTreeNode.svelte'
   import FetchProgressModal from '../components/FetchProgressModal.svelte'
   import EmptyState from '../components/EmptyState.svelte'
@@ -43,6 +47,22 @@
     [],
   )
   const allItems = useLiveQuery(() => db.items.toArray(), [])
+  const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
+
+  // Prix unitaire de référence par ressource (médiane récente).
+  const priceOf = $derived.by(() => {
+    const byItem = new Map<number, typeof allEntries.value>()
+    for (const e of allEntries.value) {
+      const list = byItem.get(e.itemId) ?? []
+      list.push(e)
+      byItem.set(e.itemId, list)
+    }
+    const now = Date.now()
+    return (itemId: number) => {
+      const entries = byItem.get(itemId)
+      return entries ? recentMedianUnit(entries, now) : null
+    }
+  })
 
   const items = $derived(new Map(allItems.value.map((i) => [i.id, i])))
   const catalog: Catalog = $derived(
@@ -54,19 +74,31 @@
   const targetList = $derived(targets.value.map((t) => ({ itemId: t.itemId, qty: t.qty })))
   const needs = $derived(computeNeeds(catalog, targetList, stateMap))
   const tree = $derived(buildDisplayTree(catalog, targetList))
-  const shopping = $derived(
-    needs.shopping
-      .map((s) => {
+  const shopping = $derived.by(() => {
+    const cost = costShopping(needs.shopping, priceOf)
+    return needs.shopping
+      .map((s, i) => {
         const need = needs.byItem.get(s.itemId)
         return {
           ...s,
           item: items.get(s.itemId),
           owned: need?.owned ?? 0,
           required: need?.required ?? s.qty,
+          unitPrice: cost.lines[i].unitPrice,
+          lineCost: cost.lines[i].lineCost,
         }
       })
-      .sort((a, b) => b.qty - a.qty),
-  )
+      .sort((a, b) => b.qty - a.qty)
+  })
+  const shoppingCost = $derived(costShopping(needs.shopping, priceOf))
+
+  // Coût effectif (crafter vs acheter) par objet, cache partagé par rendu.
+  const costOf = $derived.by(() => {
+    const cache = new Map<number, EffectiveCost>()
+    const catalogRef = catalog
+    const priceRef = priceOf
+    return (itemId: number) => effectiveCost(catalogRef, priceRef, itemId, cache)
+  })
 
   let tab = $state<'arbre' | 'courses'>('arbre')
 
@@ -229,6 +261,7 @@
           {node}
           {items}
           needs={needs.byItem}
+          {costOf}
           onModeChange={(id, mode) => setNodeMode(pid, id, mode)}
           onOwnedChange={(id, owned) => setNodeOwned(pid, id, owned)}
           onCraft={(id) => craft(id)}
@@ -243,43 +276,46 @@
             Tout est couvert par ton stock — rien à acheter !
           </p>
         {:else}
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Ressource</th>
-                <th class="text-right">Possédé</th>
-                <th class="text-right">Reste à obtenir</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {#each shopping as s (s.itemId)}
-                <tr>
-                  <td>
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <span class="text-sm text-base-content/60">Coût estimé pour finir :</span>
+            <span class="font-mono text-lg font-bold">
+              {formatKamas(shoppingCost.total)}{shoppingCost.missingPrices.length > 0 ? ' +?' : ''}
+            </span>
+          </div>
+          {#if shoppingCost.missingPrices.length > 0}
+            <p class="text-xs text-warning">
+              Total partiel : {shoppingCost.missingPrices.length} ressource(s) sans prix relevé.
+            </p>
+          {/if}
+
+          <div class="flex flex-col divide-y divide-base-200">
+            {#each shopping as s (s.itemId)}
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
+                <div class="min-w-40 flex-1">
+                  <div class="font-medium">
                     {s.item?.name ?? `item ${s.itemId}`}
                     {#if s.item?.fetchStatus === 'dead'}
                       <span class="badge badge-error badge-sm ml-1">introuvable</span>
                     {/if}
-                  </td>
-                  <td class="text-right">
-                    <div class="font-mono whitespace-nowrap">
-                      <span class="font-bold">{s.owned}</span>
-                      <span class="text-base-content/45">/ {s.required}</span>
-                    </div>
-                    <progress
-                      class="progress progress-warning h-1 w-14"
-                      value={Math.min(s.owned, s.required)}
-                      max={Math.max(s.required, 1)}
-                    ></progress>
-                  </td>
-                  <td class="text-right font-mono font-bold whitespace-nowrap">{s.qty}</td>
-                  <td class="text-right">
-                    <a href={`#/prix/${s.itemId}`} class="btn btn-ghost btn-xs">prix</a>
-                  </td>
-                </tr>
-              {/each}
-            </tbody>
-          </table>
+                  </div>
+                  <div class="text-xs text-base-content/50 whitespace-nowrap">
+                    reste <span class="font-mono font-bold text-base-content">{s.qty}</span>
+                    sur {s.required} —
+                    {#if s.lineCost !== null}
+                      ≈ <span class="font-mono">{formatKamas(s.lineCost)}</span>
+                      <span class="text-base-content/35">({formatKamas(s.unitPrice!)}/u)</span>
+                    {:else}
+                      <a href={`#/prix/${s.itemId}`} class="link link-warning">prix à relever</a>
+                    {/if}
+                  </div>
+                </div>
+                <QtyStepper value={s.owned} onchange={(v) => setNodeOwned(pid, s.itemId, v)} />
+                <a href={`#/prix/${s.itemId}`} class="btn btn-ghost btn-xs" aria-label="Voir les prix">
+                  prix
+                </a>
+              </div>
+            {/each}
+          </div>
         {/if}
       </div>
     </div>
