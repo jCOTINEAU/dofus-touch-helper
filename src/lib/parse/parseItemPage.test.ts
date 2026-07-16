@@ -93,6 +93,23 @@ describe('parseItemPage', () => {
     expect(item.recipe!.components).toHaveLength(7)
   })
 
+  it('recette sans métier (Farine de Houblon, fabriquée au Moulin)', () => {
+    const item = parseItemPage(
+      fixture('ressource-farine-houblon-sans-metier.md'),
+      `${BASE}/ressources/535-farine-houblon`,
+    )
+    expect(item.name).toBe('Farine de Houblon')
+    expect(item.recipe).not.toBeNull()
+    // Pas de ligne « Métier Niveau X » sur la page → job vide, mais recette valide.
+    expect(item.recipe!.job).toBe('')
+    expect(item.recipe!.jobLevel).toBe(0)
+    expect(item.recipe!.components).toHaveLength(1)
+    expect(item.recipe!.components[0]).toMatchObject({ itemId: 401, name: 'Houblon', qty: 2 })
+    // La section « Est utilisé pour les recettes » ne doit pas polluer les composants.
+    const names = item.recipe!.components.map((c) => c.name)
+    expect(names).not.toContain('Baguette Deuh-Pain')
+  })
+
   it('page morte → DeadPageError', () => {
     expect(() =>
       parseItemPage(fixture('page-morte-bocal.md'), `${BASE}/ressources/1468-bocal`),

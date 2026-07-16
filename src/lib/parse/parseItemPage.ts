@@ -118,7 +118,12 @@ export function parseItemPage(markdown: string, sourceUrl: string): ParsedItem {
   return { id, name, category, level, imageUrl, recipe }
 }
 
-function parseRecipe(lines: string[], sourceUrl: string): Recipe {
+function parseRecipe(allLines: string[], sourceUrl: string): Recipe {
+  // La section « Est utilisé pour les recettes » liste les objets qui
+  // CONSOMMENT cet item : elle marque la fin de la recette de fabrication.
+  const endIdx = allLines.findIndex((l) => /^Est utilisé/i.test(l))
+  const lines = endIdx === -1 ? allLines : allLines.slice(0, endIdx)
+
   let job = ''
   let jobLevel = 0
   const components: RecipeComponent[] = []
@@ -127,6 +132,10 @@ function parseRecipe(lines: string[], sourceUrl: string): Recipe {
     name?: string
   } = null as never
   let open = false
+  // Certaines recettes n'ont pas de métier (ex. farines fabriquées au Moulin) :
+  // la section enchaîne directement sur « N x ». On ne cherche le métier
+  // qu'avant le premier composant.
+  let started = false
 
   const close = () => {
     if (open && current.name !== undefined) {
@@ -146,20 +155,24 @@ function parseRecipe(lines: string[], sourceUrl: string): Recipe {
   for (const line of lines) {
     if (line === '') continue
 
-    if (job === '') {
-      const m = JOB_RE.exec(line)
-      if (m) {
-        job = m[1].trim()
-        jobLevel = Number(m[2])
-      }
-      continue
-    }
-
     const qtyMatch = QTY_RE.exec(line)
     if (qtyMatch) {
+      started = true
       close()
       current = { qty: Number(qtyMatch[1]) }
       open = true
+      continue
+    }
+
+    // Avant le premier « N x » : on capture le métier s'il est présent.
+    if (!started) {
+      if (job === '') {
+        const m = JOB_RE.exec(line)
+        if (m) {
+          job = m[1].trim()
+          jobLevel = Number(m[2])
+        }
+      }
       continue
     }
     if (!open) continue
@@ -192,8 +205,10 @@ function parseRecipe(lines: string[], sourceUrl: string): Recipe {
   }
   close()
 
-  if (job === '' || components.length === 0) {
-    throw new ParseError(`Section Recette illisible (métier: "${job}", ${components.length} composants) : ${sourceUrl}`)
+  // Le métier peut légitimement être absent (fabrication au Moulin, etc.) ;
+  // seule une recette sans aucun composant est considérée illisible.
+  if (components.length === 0) {
+    throw new ParseError(`Section Recette sans composant : ${sourceUrl}`)
   }
   return { job, jobLevel, components }
 }

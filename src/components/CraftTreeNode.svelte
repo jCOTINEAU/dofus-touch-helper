@@ -144,7 +144,9 @@
           <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
             {#if item?.recipe}
               <span class="badge badge-soft badge-primary badge-sm whitespace-nowrap">
-                🔨 {item.recipe.job} niv. {item.recipe.jobLevel}
+                🔨 {item.recipe.job
+                  ? `${item.recipe.job} niv. ${item.recipe.jobLevel}`
+                  : 'Fabrication'}
               </span>
               {#if buyMode}
                 <span class="text-xs text-secondary">acheté tel quel — recette ignorée</span>

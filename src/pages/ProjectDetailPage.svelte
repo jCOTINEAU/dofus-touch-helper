@@ -113,6 +113,8 @@
   const farmAdviceFor = $derived(makeFarmAdvisor(allCombats.value, allLoots.value, priceOf))
 
   let tab = $state<'arbre' | 'courses'>('arbre')
+  // Récap des cibles replié par défaut (peut être long) ; s'ouvre s'il est vide.
+  let targetsOpen = $state(false)
 
   // --- Ajout de cible (expansion avec modal de progression) ---
   let expanding = $state(false)
@@ -215,28 +217,37 @@
     {/if}
 
     {#if targets.value.length > 0}
-      <div class="flex flex-col gap-1 mt-2">
-        {#each targets.value as t (t.id)}
-          <div class="flex items-center gap-2 text-sm">
-            <span class="flex-1">{items.get(t.itemId)?.name ?? `item ${t.itemId}`}</span>
-            <input
-              type="number"
-              class="input input-bordered h-11 w-24 text-center"
-              min="0"
-              inputmode="numeric"
-              value={t.qty}
-              onchange={(e) => setTargetQty(t.id!, Math.floor(Number(e.currentTarget.value)))}
-              aria-label="Quantité cible"
-            />
-            <button
-              class="btn btn-ghost btn-square h-11 w-11 text-error"
-              onclick={() => setTargetQty(t.id!, 0)}
-              aria-label="Retirer"
-            >
-              ✕
-            </button>
+      <div class="collapse collapse-arrow bg-base-200/40 mt-2">
+        <input type="checkbox" bind:checked={targetsOpen} />
+        <div class="collapse-title font-medium">
+          Objets du projet
+          <span class="badge badge-ghost badge-sm ml-1">{targets.value.length}</span>
+        </div>
+        <div class="collapse-content">
+          <div class="flex flex-col gap-1">
+            {#each targets.value as t (t.id)}
+              <div class="flex items-center gap-2 text-sm">
+                <span class="flex-1">{items.get(t.itemId)?.name ?? `item ${t.itemId}`}</span>
+                <input
+                  type="number"
+                  class="input input-bordered h-11 w-24 text-center"
+                  min="0"
+                  inputmode="numeric"
+                  value={t.qty}
+                  onchange={(e) => setTargetQty(t.id!, Math.floor(Number(e.currentTarget.value)))}
+                  aria-label="Quantité cible"
+                />
+                <button
+                  class="btn btn-ghost btn-square h-11 w-11 text-error"
+                  onclick={() => setTargetQty(t.id!, 0)}
+                  aria-label="Retirer"
+                >
+                  ✕
+                </button>
+              </div>
+            {/each}
           </div>
-        {/each}
+        </div>
       </div>
     {/if}
   </div>

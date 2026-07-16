@@ -21,14 +21,30 @@
   // cible ou expiration.
   let restoreToken = 0
   $effect(() => {
-    void route // dépendance : ré-exécute à chaque navigation
+    void route.name // dépendance : ré-exécute à chaque navigation
+    void route.params.id
+    void route.params.itemId
     const target = router.savedScroll()
     const myToken = ++restoreToken
-    let frames = 0
-    const step = () => {
+    if (target <= 0) {
+      window.scrollTo(0, 0)
+      return
+    }
+    // La page se remplit de façon asynchrone (Dexie) et sa hauteur grandit :
+    // on ré-applique la cible à chaque frame pendant ~2,5 s, en s'arrêtant dès
+    // qu'elle est atteinte (ou si l'utilisateur scrolle lui-même).
+    let startTs = 0
+    let lastY = -1
+    const step = (ts: number) => {
       if (myToken !== restoreToken) return
+      if (startTs === 0) startTs = ts
+      // L'utilisateur a pris la main : on arrête pour ne pas le contrarier.
+      if (lastY >= 0 && Math.abs(window.scrollY - lastY) > 4 && Math.abs(window.scrollY - target) > 4) {
+        return
+      }
       window.scrollTo(0, target)
-      if (target > 0 && Math.abs(window.scrollY - target) > 2 && frames++ < 40) {
+      lastY = window.scrollY
+      if (Math.abs(window.scrollY - target) > 2 && ts - startTs < 2500) {
         requestAnimationFrame(step)
       }
     }
