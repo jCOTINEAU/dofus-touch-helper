@@ -38,6 +38,32 @@ export function seriesByLot(entries: readonly PriceEntry[]): Record<LotSize, Pri
   return result
 }
 
+/**
+ * Fenêtre de « session de relevés » : des prix saisis à quelques secondes
+ * ou minutes d'intervalle (typiquement les lots 1/10/100 relevés d'un coup
+ * à l'HDV) sont regroupés sur un même point de l'axe du temps.
+ */
+export const SESSION_WINDOW_MS = 10 * 60 * 1000
+
+/**
+ * Regroupe des points (triés chronologiquement) par fenêtre : le dernier
+ * relevé de la fenêtre gagne, et le point est recalé au centre de la
+ * fenêtre. Les fenêtres étant absolues, toutes les séries d'un même item
+ * partagent les mêmes positions x.
+ */
+export function bucketPoints(
+  points: readonly PricePoint[],
+  windowMs = SESSION_WINDOW_MS,
+): PricePoint[] {
+  const byBucket = new Map<number, PricePoint>()
+  for (const p of points) {
+    byBucket.set(Math.floor(p.t / windowMs), p)
+  }
+  return [...byBucket.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([bucket, p]) => ({ ...p, t: bucket * windowMs + windowMs / 2 }))
+}
+
 export interface LotStats {
   /** Moyenne du prix unitaire. */
   mean: number | null

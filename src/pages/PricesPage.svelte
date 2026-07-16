@@ -9,6 +9,7 @@
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
 
   let search = $state('')
+  let openLetter = $state<string | null>(null)
 
   const entriesByItem = $derived.by(() => {
     const map = new Map<number, typeof allEntries.value>()
@@ -20,72 +21,123 @@
     return map
   })
 
+  const medianOf = $derived((itemId: number) => {
+    const entries = entriesByItem.get(itemId)
+    return entries ? recentMedianUnit(entries, Date.now()) : null
+  })
+
   const tracked = $derived(
     allItems.value
       .filter((i) => entriesByItem.has(i.id))
-      .map((i) => ({
-        item: i,
-        count: entriesByItem.get(i.id)!.length,
-        median: recentMedianUnit(entriesByItem.get(i.id)!, Date.now()),
-      }))
-      .sort((a, b) => a.item.name.localeCompare(b.item.name)),
+      .map((i) => ({ item: i, count: entriesByItem.get(i.id)!.length, median: medianOf(i.id) }))
+      .sort((a, b) => a.item.name.localeCompare(b.item.name, 'fr')),
   )
+
+  /** Première lettre sans accent, ou # pour le reste. */
+  function letterOf(name: string): string {
+    const c = name
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '')
+      .toUpperCase()
+      .charAt(0)
+    return c >= 'A' && c <= 'Z' ? c : '#'
+  }
+
+  const byLetter = $derived.by(() => {
+    const map = new Map<string, typeof allItems.value>()
+    for (const item of [...allItems.value].sort((a, b) => a.name.localeCompare(b.name, 'fr'))) {
+      const letter = letterOf(item.name)
+      const list = map.get(letter) ?? []
+      list.push(item)
+      map.set(letter, list)
+    }
+    return [...map.entries()].sort(([a], [b]) => (a === '#' ? 1 : b === '#' ? -1 : a < b ? -1 : 1))
+  })
 
   const searchResults = $derived.by(() => {
     const q = search.trim().toLowerCase()
     if (q.length < 2) return []
     return allItems.value
-      .filter((i) => i.name.toLowerCase().includes(q) && !entriesByItem.has(i.id))
+      .filter((i) => i.name.toLowerCase().includes(q))
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr'))
       .slice(0, 20)
   })
+
+  const fmtMedian = (m: number | null) =>
+    m === null ? null : `${Math.round(m * 100) / 100} k/u`
 </script>
+
+{#snippet itemRow(item: (typeof allItems.value)[number])}
+  {@const median = fmtMedian(medianOf(item.id))}
+  <a href={`#/prix/${item.id}`} class="flex items-center gap-3 py-2 min-h-11">
+    <ItemAvatar imageUrl={item.imageUrl} name={item.name} size={32} />
+    <span class="flex-1">{item.name}</span>
+    {#if median}
+      <span class="font-mono text-sm">{median}</span>
+    {:else}
+      <span class="text-xs text-base-content/40">suivre →</span>
+    {/if}
+  </a>
+{/snippet}
 
 <h1 class="text-2xl font-bold mb-4">Prix HDV</h1>
 
 <label class="input input-bordered flex items-center gap-2 mb-4 w-full">
-  <input
-    type="search"
-    class="grow"
-    placeholder="Chercher une ressource connue (déjà rencontrée dans un craft)…"
-    bind:value={search}
-  />
+  <input type="search" class="grow" placeholder="Chercher une ressource…" bind:value={search} />
 </label>
 
-{#if searchResults.length > 0}
+{#if search.trim().length >= 2}
   <div class="card bg-base-100 shadow-sm mb-4">
     <div class="card-body py-3">
-      {#each searchResults as item (item.id)}
-        <a href={`#/prix/${item.id}`} class="flex items-center gap-3 py-1">
-          <ItemAvatar imageUrl={item.imageUrl} name={item.name} size={32} />
-          <span>{item.name}</span>
-          <span class="text-xs text-base-content/40 ml-auto">suivre →</span>
-        </a>
-      {/each}
+      {#if searchResults.length === 0}
+        <p class="text-sm text-base-content/50">Aucune ressource connue ne correspond.</p>
+      {:else}
+        {#each searchResults as item (item.id)}
+          {@render itemRow(item)}
+        {/each}
+      {/if}
     </div>
   </div>
-{/if}
+{:else}
+  {#if allItems.value.length === 0}
+    <EmptyState
+      message="Aucune ressource connue."
+      hint="Les ressources apparaissent ici dès qu'un projet a chargé leurs recettes."
+    />
+  {:else}
+    {#if tracked.length > 0}
+      <div class="card bg-base-100 shadow-sm mb-4">
+        <div class="card-body py-4">
+          <h2 class="font-semibold text-sm text-base-content/60 uppercase">Suivies</h2>
+          {#each tracked as row (row.item.id)}
+            {@render itemRow(row.item)}
+          {/each}
+        </div>
+      </div>
+    {/if}
 
-{#if tracked.length === 0 && searchResults.length === 0}
-  <EmptyState
-    message="Aucune ressource suivie."
-    hint="Cherche une ressource ci-dessus, ou passe par la liste de courses d'un projet (bouton « prix »)."
-  />
-{:else if tracked.length > 0}
-  <div class="card bg-base-100 shadow-sm">
-    <div class="card-body py-4">
-      <h2 class="font-semibold text-sm text-base-content/60 uppercase">Suivies</h2>
-      {#each tracked as row (row.item.id)}
-        <a href={`#/prix/${row.item.id}`} class="flex items-center gap-3 py-1">
-          <ItemAvatar imageUrl={row.item.imageUrl} name={row.item.name} size={36} />
-          <div class="flex-1">
-            <div class="font-medium">{row.item.name}</div>
-            <div class="text-xs text-base-content/50">{row.count} relevé(s)</div>
+    <h2 class="font-semibold text-sm text-base-content/60 uppercase mb-2 px-1">
+      Toutes les ressources connues
+    </h2>
+    <div class="flex flex-col gap-2">
+      {#each byLetter as [letter, items] (letter)}
+        <div class="collapse collapse-arrow bg-base-100 shadow-sm">
+          <input
+            type="checkbox"
+            checked={openLetter === letter}
+            onchange={() => (openLetter = openLetter === letter ? null : letter)}
+          />
+          <div class="collapse-title font-bold">
+            {letter}
+            <span class="badge badge-ghost badge-sm ml-2">{items.length}</span>
           </div>
-          {#if row.median !== null}
-            <span class="font-mono">{Math.round(row.median * 100) / 100} k/u</span>
-          {/if}
-        </a>
+          <div class="collapse-content">
+            {#each items as item (item.id)}
+              {@render itemRow(item)}
+            {/each}
+          </div>
+        </div>
       {/each}
     </div>
-  </div>
+  {/if}
 {/if}

@@ -3,7 +3,13 @@
     value,
     onchange,
     label = 'Possédé',
-  }: { value: number; onchange: (v: number) => void; label?: string } = $props()
+    showLabel = false,
+  }: {
+    value: number
+    onchange: (v: number) => void
+    label?: string
+    showLabel?: boolean
+  } = $props()
 
   let text = $derived(String(value))
 
@@ -13,24 +19,35 @@
   }
 </script>
 
-<div class="join" aria-label={label}>
-  <button
-    class="btn btn-square join-item"
-    onclick={() => onchange(Math.max(0, value - 1))}
-    disabled={value <= 0}
-    aria-label="Moins"
-  >
-    −
-  </button>
-  <input
-    class="input input-bordered join-item w-16 text-center"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    value={text}
-    onchange={(e) => commit(e.currentTarget.value)}
-    aria-label={label}
-  />
-  <button class="btn btn-square join-item" onclick={() => onchange(value + 1)} aria-label="Plus">
-    +
-  </button>
+<div class="flex flex-col items-start gap-0.5">
+  {#if showLabel}
+    <span class="text-[11px] font-medium tracking-wide text-base-content/50 uppercase">
+      {label}
+    </span>
+  {/if}
+  <div class="join" aria-label={label}>
+    <button
+      class="btn btn-square join-item h-11 w-11 text-lg"
+      onclick={() => onchange(Math.max(0, value - 1))}
+      disabled={value <= 0}
+      aria-label="Moins"
+    >
+      −
+    </button>
+    <input
+      class="input input-bordered join-item h-11 w-14 text-center text-base font-semibold"
+      inputmode="numeric"
+      pattern="[0-9]*"
+      value={text}
+      onchange={(e) => commit(e.currentTarget.value)}
+      aria-label={label}
+    />
+    <button
+      class="btn btn-square join-item h-11 w-11 text-lg"
+      onclick={() => onchange(value + 1)}
+      aria-label="Plus"
+    >
+      +
+    </button>
+  </div>
 </div>

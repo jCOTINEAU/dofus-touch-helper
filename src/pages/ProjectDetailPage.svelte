@@ -116,7 +116,7 @@
 </script>
 
 <div class="flex items-center gap-2 mb-4">
-  <a href="#/" class="btn btn-ghost btn-sm">←</a>
+  <a href="#/" class="btn btn-ghost btn-square text-xl" aria-label="Retour aux projets">←</a>
   <h1 class="text-2xl font-bold flex-1">{project.value?.name ?? '…'}</h1>
 </div>
 
@@ -141,7 +141,7 @@
             <span class="flex-1">{items.get(t.itemId)?.name ?? `item ${t.itemId}`}</span>
             <input
               type="number"
-              class="input input-bordered input-sm w-20"
+              class="input input-bordered h-11 w-24 text-center"
               min="0"
               inputmode="numeric"
               value={t.qty}
@@ -149,7 +149,7 @@
               aria-label="Quantité cible"
             />
             <button
-              class="btn btn-ghost btn-sm text-error"
+              class="btn btn-ghost btn-square h-11 w-11 text-error"
               onclick={() => setTargetQty(t.id!, 0)}
               aria-label="Retirer"
             >
@@ -178,7 +178,7 @@
     hint="Colle l'URL encyclopédie d'un objet (dofus-touch.com) pour construire l'arbre de craft."
   />
 {:else}
-  <div role="tablist" class="tabs tabs-box mb-4">
+  <div role="tablist" class="tabs tabs-box tabs-lg mb-4">
     <button
       role="tab"
       class="tab {tab === 'arbre' ? 'tab-active' : ''}"
@@ -196,19 +196,17 @@
   </div>
 
   {#if tab === 'arbre'}
-    <div class="card bg-base-100 shadow-sm">
-      <div class="card-body py-4">
-        {#each tree as node (node.itemId)}
-          <CraftTreeNode
-            {node}
-            {items}
-            needs={needs.byItem}
-            onModeChange={(id, mode) => setNodeMode(pid, id, mode)}
-            onOwnedChange={(id, owned) => setNodeOwned(pid, id, owned)}
-            onCraft={(id) => craft(id)}
-          />
-        {/each}
-      </div>
+    <div>
+      {#each tree as node (node.itemId)}
+        <CraftTreeNode
+          {node}
+          {items}
+          needs={needs.byItem}
+          onModeChange={(id, mode) => setNodeMode(pid, id, mode)}
+          onOwnedChange={(id, owned) => setNodeOwned(pid, id, owned)}
+          onCraft={(id) => craft(id)}
+        />
+      {/each}
     </div>
   {:else}
     <div class="card bg-base-100 shadow-sm">
@@ -249,15 +247,19 @@
 
 {#if craftDialog}
   {@const dialogItem = items.get(craftDialog.itemId)}
-  <dialog class="modal" open>
+  <dialog class="modal modal-bottom sm:modal-middle" open>
     <div class="modal-box">
-      <h3 class="font-bold text-lg">Stock insuffisant</h3>
+      <h3 class="font-bold text-lg">⚠️ Stock insuffisant</h3>
       <p class="py-2 text-sm">
-        Pour crafter 1 × {dialogItem?.name ?? craftDialog.itemId}, il manque :
+        Pour crafter 1 × <span class="font-semibold">{dialogItem?.name ?? craftDialog.itemId}</span>,
+        il manque :
       </p>
-      <ul class="list-disc list-inside text-sm">
+      <ul class="rounded-box bg-base-200 px-4 py-3 text-sm flex flex-col gap-1">
         {#each craftDialog.missing as m (m.itemId)}
-          <li>{m.missing} × {items.get(m.itemId)?.name ?? m.itemId}</li>
+          <li class="flex items-center gap-2">
+            <span class="badge badge-warning badge-sm font-mono">{m.missing}</span>
+            <span>{items.get(m.itemId)?.name ?? m.itemId}</span>
+          </li>
         {/each}
       </ul>
       <p class="py-2 text-xs text-base-content/60">
@@ -265,11 +267,16 @@
         crafté avec des ressources jamais enregistrées ici).
       </p>
       <div class="modal-action">
-        <button class="btn btn-ghost" onclick={() => (craftDialog = null)}>Annuler</button>
-        <button class="btn btn-warning" onclick={() => craft(craftDialog!.itemId, true)}>
-          Forcer
+        <button class="btn h-11 btn-ghost" onclick={() => (craftDialog = null)}>Annuler</button>
+        <button class="btn h-11 btn-warning" onclick={() => craft(craftDialog!.itemId, true)}>
+          Forcer quand même
         </button>
       </div>
     </div>
+    <button
+      class="modal-backdrop"
+      onclick={() => (craftDialog = null)}
+      aria-label="Fermer"
+    ></button>
   </dialog>
 {/if}

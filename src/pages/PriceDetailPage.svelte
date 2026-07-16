@@ -3,6 +3,7 @@
   import { useLiveQuery } from '../lib/stores/liveQuery.svelte'
   import {
     LOT_SIZES,
+    bucketPoints,
     divergence,
     lotStats,
     recentMedianUnit,
@@ -32,11 +33,16 @@
   const COLORS: Record<LotSize, string> = { 1: '#6366f1', 10: '#f59e0b', 100: '#10b981' }
   let view = $state<'unit' | 'lot'>('unit')
 
+  // Les relevés d'une même session HDV (fenêtre de 10 min) fusionnent en un
+  // seul point x, aligné entre les trois séries de lots.
   const chartSeries = $derived(
     LOT_SIZES.map((size) => ({
       label: view === 'unit' ? `lot ×${size} (k/unité)` : `lot ×${size} (k/lot)`,
       color: COLORS[size],
-      points: series[size].map((p) => ({ t: p.t, v: view === 'unit' ? p.unit : p.lot })),
+      points: bucketPoints(series[size]).map((p) => ({
+        t: p.t,
+        v: view === 'unit' ? p.unit : p.lot,
+      })),
     })).filter((s) => s.points.length > 0),
   )
 
