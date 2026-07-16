@@ -8,6 +8,7 @@
   import CombatsPage from './pages/CombatsPage.svelte'
   import CombatDetailPage from './pages/CombatDetailPage.svelte'
   import SettingsPage from './pages/SettingsPage.svelte'
+  import PriceSessionPage from './pages/PriceSessionPage.svelte'
   import DebugPage from './pages/DebugPage.svelte'
   import { swUpdate } from './lib/stores/swUpdate.svelte'
   import { lastProject } from './lib/stores/lastProject.svelte'
@@ -22,7 +23,7 @@
   const navItems = $derived([
     { hash: projetsHash, name: 'projets', label: 'Projets', match: ['projets', 'projet'] },
     { hash: '#/courses', name: 'courses', label: 'Courses', match: ['courses'] },
-    { hash: '#/prix', name: 'prix', label: 'Prix', match: ['prix', 'prixDetail'] },
+    { hash: '#/prix', name: 'prix', label: 'Prix', match: ['prix', 'prixDetail', 'prixSession'] },
     { hash: '#/combats', name: 'combats', label: 'Combats', match: ['combats', 'combatDetail'] },
     { hash: '#/reglages', name: 'reglages', label: 'Réglages', match: ['reglages'] },
   ])
@@ -44,6 +45,8 @@
       <ShoppingListPage />
     {:else if route.name === 'prix'}
       <PricesPage />
+    {:else if route.name === 'prixSession'}
+      <PriceSessionPage />
     {:else if route.name === 'prixDetail'}
       {#key route.params.itemId}
         <PriceDetailPage itemId={route.params.itemId} />

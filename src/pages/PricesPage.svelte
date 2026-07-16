@@ -2,8 +2,11 @@
   import { db } from '../lib/db/db'
   import { useLiveQuery } from '../lib/stores/liveQuery.svelte'
   import { recentMedianUnit } from '../lib/prices/stats'
+  import { formatRelativeTime } from '../lib/prices/format'
   import ItemAvatar from '../components/ItemAvatar.svelte'
   import EmptyState from '../components/EmptyState.svelte'
+
+  const STALE_MS = 3 * 24 * 3600 * 1000
 
   const allItems = useLiveQuery(() => db.items.toArray(), [])
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
@@ -29,7 +32,12 @@
   const tracked = $derived(
     allItems.value
       .filter((i) => entriesByItem.has(i.id))
-      .map((i) => ({ item: i, count: entriesByItem.get(i.id)!.length, median: medianOf(i.id) }))
+      .map((i) => ({
+        item: i,
+        count: entriesByItem.get(i.id)!.length,
+        median: medianOf(i.id),
+        lastAt: entriesByItem.get(i.id)!.reduce((m, e) => Math.max(m, e.recordedAt), 0),
+      }))
       .sort((a, b) => a.item.name.localeCompare(b.item.name, 'fr')),
   )
 
@@ -82,9 +90,17 @@
 
 <h1 class="text-2xl font-bold mb-4">Prix HDV</h1>
 
-<label class="input input-bordered flex items-center gap-2 mb-4 w-full">
-  <input type="search" class="grow" placeholder="Chercher une ressource…" bind:value={search} />
-</label>
+<div class="sticky top-0 z-10 -mx-4 bg-base-200 px-4 pb-3 pt-1">
+  <label class="input input-bordered flex items-center gap-2 w-full">
+    <input type="search" class="grow" placeholder="Chercher une ressource…" bind:value={search} />
+  </label>
+</div>
+
+{#if tracked.length > 0 && search.trim().length < 2}
+  <a href="#/prix/session" class="btn btn-primary btn-lg mb-4 w-full">
+    ▶ Démarrer une session HDV ({tracked.length} suivies)
+  </a>
+{/if}
 
 {#if search.trim().length >= 2}
   <div class="card bg-base-100 shadow-sm mb-4">
@@ -110,7 +126,19 @@
         <div class="card-body py-4">
           <h2 class="font-semibold text-sm text-base-content/60 uppercase">Suivies</h2>
           {#each tracked as row (row.item.id)}
-            {@render itemRow(row.item)}
+            {@const stale = Date.now() - row.lastAt > STALE_MS}
+            <a href={`#/prix/${row.item.id}`} class="flex items-center gap-3 py-2 min-h-11">
+              <ItemAvatar imageUrl={row.item.imageUrl} name={row.item.name} size={32} />
+              <div class="flex-1">
+                <div>{row.item.name}</div>
+                <div class="text-xs {stale ? 'text-warning' : 'text-base-content/40'}">
+                  {stale ? '⚠ ' : '✓ '}{formatRelativeTime(row.lastAt, Date.now())}
+                </div>
+              </div>
+              {#if row.median !== null}
+                <span class="font-mono text-sm">{fmtMedian(row.median)}</span>
+              {/if}
+            </a>
           {/each}
         </div>
       </div>

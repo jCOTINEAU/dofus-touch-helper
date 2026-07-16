@@ -13,6 +13,8 @@ const patterns: { pattern: string; name: string }[] = [
   { pattern: 'projets/:id', name: 'projet' },
   { pattern: 'courses', name: 'courses' },
   { pattern: 'prix', name: 'prix' },
+  // Avant prix/:itemId (premier motif gagnant).
+  { pattern: 'prix/session', name: 'prixSession' },
   { pattern: 'prix/:itemId', name: 'prixDetail' },
   { pattern: 'combats', name: 'combats' },
   { pattern: 'combats/:id', name: 'combatDetail' },
