@@ -85,7 +85,12 @@
           lineCost: unitPrice === null ? null : unitPrice * line.remaining,
         }
       })
-      .sort((a, b) => b.remaining - a.remaining)
+      .sort((a, b) =>
+        (a.item?.name ?? `item ${a.itemId}`).localeCompare(
+          b.item?.name ?? `item ${b.itemId}`,
+          'fr',
+        ),
+      )
   })
 
   const total = $derived(rows.reduce((sum, r) => sum + (r.lineCost ?? 0), 0))

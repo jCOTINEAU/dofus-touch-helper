@@ -92,7 +92,12 @@
           lineCost: cost.lines[i].lineCost,
         }
       })
-      .sort((a, b) => b.qty - a.qty)
+      .sort((a, b) =>
+        (a.item?.name ?? `item ${a.itemId}`).localeCompare(
+          b.item?.name ?? `item ${b.itemId}`,
+          'fr',
+        ),
+      )
   })
   const shoppingCost = $derived(costShopping(needs.shopping, priceOf))
 

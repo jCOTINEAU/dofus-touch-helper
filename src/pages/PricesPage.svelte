@@ -14,6 +14,14 @@
   let search = $state('')
   let openLetter = $state<string | null>(null)
 
+  // Section « Suivies » repliable, choix mémorisé (liste potentiellement longue).
+  const TRACKED_OPEN_KEY = 'dofus-craft:prices-tracked-open'
+  let trackedOpen = $state(localStorage.getItem(TRACKED_OPEN_KEY) !== 'false')
+  function toggleTracked() {
+    trackedOpen = !trackedOpen
+    localStorage.setItem(TRACKED_OPEN_KEY, String(trackedOpen))
+  }
+
   const entriesByItem = $derived.by(() => {
     const map = new Map<number, typeof allEntries.value>()
     for (const e of allEntries.value) {
@@ -122,9 +130,17 @@
     />
   {:else}
     {#if tracked.length > 0}
-      <div class="card bg-base-100 shadow-sm mb-4">
-        <div class="card-body py-4">
-          <h2 class="font-semibold text-sm text-base-content/60 uppercase">Suivies</h2>
+      {@const staleCount = tracked.filter((r) => Date.now() - r.lastAt > STALE_MS).length}
+      <div class="collapse collapse-arrow bg-base-100 shadow-sm mb-4">
+        <input type="checkbox" checked={trackedOpen} onchange={toggleTracked} />
+        <div class="collapse-title font-semibold">
+          Suivies
+          <span class="badge badge-ghost badge-sm ml-2">{tracked.length}</span>
+          {#if staleCount > 0}
+            <span class="badge badge-warning badge-sm ml-1">⚠ {staleCount} à rafraîchir</span>
+          {/if}
+        </div>
+        <div class="collapse-content">
           {#each tracked as row (row.item.id)}
             {@const stale = Date.now() - row.lastAt > STALE_MS}
             <a href={`#/prix/${row.item.id}`} class="flex items-center gap-3 py-2 min-h-11">
