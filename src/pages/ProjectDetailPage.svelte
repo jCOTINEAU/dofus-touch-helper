@@ -9,6 +9,8 @@
   import { recentMedianUnit } from '../lib/prices/stats'
   import { costShopping, effectiveCost, type EffectiveCost } from '../lib/prices/costs'
   import { formatKamas } from '../lib/prices/format'
+  import { makeFarmAdvisor } from '../lib/combats/farming'
+  import FarmHint from '../components/FarmHint.svelte'
   import type { Project } from '../lib/types'
   import AddTargetForm from '../components/AddTargetForm.svelte'
   import QtyStepper from '../components/QtyStepper.svelte'
@@ -48,6 +50,8 @@
   )
   const allItems = useLiveQuery(() => db.items.toArray(), [])
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
+  const allCombats = useLiveQuery(() => db.combats.toArray(), [])
+  const allLoots = useLiveQuery(() => db.combatLoots.toArray(), [])
 
   // Prix unitaire de référence par ressource (médiane récente).
   const priceOf = $derived.by(() => {
@@ -99,6 +103,9 @@
     const priceRef = priceOf
     return (itemId: number) => effectiveCost(catalogRef, priceRef, itemId, cache)
   })
+
+  // Conseil farm vs achat (meilleur combat qui loote la ressource).
+  const farmAdviceFor = $derived(makeFarmAdvisor(allCombats.value, allLoots.value, priceOf))
 
   let tab = $state<'arbre' | 'courses'>('arbre')
 
@@ -308,6 +315,9 @@
                       <a href={`#/prix/${s.itemId}`} class="link link-warning">prix à relever</a>
                     {/if}
                   </div>
+                  {#if farmAdviceFor(s.itemId, s.qty, s.unitPrice)}
+                    <FarmHint advice={farmAdviceFor(s.itemId, s.qty, s.unitPrice)!} />
+                  {/if}
                 </div>
                 <QtyStepper value={s.owned} onchange={(v) => setNodeOwned(pid, s.itemId, v)} />
                 <a href={`#/prix/${s.itemId}`} class="btn btn-ghost btn-xs" aria-label="Voir les prix">

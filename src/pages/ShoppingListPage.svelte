@@ -6,14 +6,18 @@
   import { computeGlobalShopping } from '../lib/needs/shopping'
   import { recentMedianUnit } from '../lib/prices/stats'
   import { formatKamas } from '../lib/prices/format'
+  import { makeFarmAdvisor } from '../lib/combats/farming'
   import QtyStepper from '../components/QtyStepper.svelte'
   import EmptyState from '../components/EmptyState.svelte'
+  import FarmHint from '../components/FarmHint.svelte'
 
   const projects = useLiveQuery(() => db.projects.toArray(), [])
   const allTargets = useLiveQuery(() => db.projectTargets.toArray(), [])
   const allStates = useLiveQuery(() => db.nodeStates.toArray(), [])
   const allItems = useLiveQuery(() => db.items.toArray(), [])
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
+  const allCombats = useLiveQuery(() => db.combats.toArray(), [])
+  const allLoots = useLiveQuery(() => db.combatLoots.toArray(), [])
 
   const items = $derived(new Map(allItems.value.map((i) => [i.id, i])))
 
@@ -87,6 +91,8 @@
   const total = $derived(rows.reduce((sum, r) => sum + (r.lineCost ?? 0), 0))
   const missingPriceCount = $derived(rows.filter((r) => r.lineCost === null).length)
 
+  const farmAdviceFor = $derived(makeFarmAdvisor(allCombats.value, allLoots.value, priceOf))
+
   let openItem = $state<number | null>(null)
 </script>
 
@@ -150,6 +156,9 @@
                 </a>
               {/if}
             </div>
+            {#if farmAdviceFor(row.itemId, row.remaining, row.unitPrice)}
+              <FarmHint advice={farmAdviceFor(row.itemId, row.remaining, row.unitPrice)!} />
+            {/if}
           </div>
           <a
             href={`#/prix/${row.itemId}`}
