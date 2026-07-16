@@ -3,6 +3,9 @@
   import { useLiveQuery } from '../lib/stores/liveQuery.svelte'
   import { recentMedianUnit } from '../lib/prices/stats'
   import { formatRelativeTime } from '../lib/prices/format'
+  import { getOrFetchItem } from '../lib/fetch/itemLoader'
+  import { isEncyclopediaItemUrl } from '../lib/fetch/url'
+  import { router } from '../lib/router.svelte'
   import ItemAvatar from '../components/ItemAvatar.svelte'
   import EmptyState from '../components/EmptyState.svelte'
 
@@ -14,6 +17,29 @@
   import { pricesView } from '../lib/stores/pricesView.svelte'
 
   let search = $state('')
+
+  // --- Suivre une nouvelle ressource par URL (fetch d'un seul item dans le
+  // cache commun, sans projet). ---
+  let newUrl = $state('')
+  let adding = $state(false)
+  let addError = $state('')
+  const addValid = $derived(isEncyclopediaItemUrl(newUrl))
+
+  async function addResource(e: SubmitEvent) {
+    e.preventDefault()
+    if (!addValid || adding) return
+    adding = true
+    addError = ''
+    try {
+      const { item } = await getOrFetchItem(newUrl.trim())
+      newUrl = ''
+      router.go(`prix/${item.id}`)
+    } catch (err) {
+      addError = `Impossible d'ajouter cette ressource (${String(err)}).`
+    } finally {
+      adding = false
+    }
+  }
 
   // Section « Suivies » repliable, choix mémorisé (liste potentiellement longue).
   const TRACKED_OPEN_KEY = 'dofus-craft:prices-tracked-open'
@@ -104,6 +130,27 @@
     <input type="search" class="grow" placeholder="Chercher une ressource…" bind:value={search} />
   </label>
 </div>
+
+<form class="mb-4 flex flex-wrap gap-2" onsubmit={addResource}>
+  <input
+    type="url"
+    class="input input-bordered flex-1 min-w-60"
+    placeholder="Suivre une ressource : coller son URL encyclopédie…"
+    bind:value={newUrl}
+    disabled={adding}
+  />
+  <button class="btn btn-primary" type="submit" disabled={!addValid || adding}>
+    {#if adding}<span class="loading loading-spinner loading-sm"></span>{:else}Suivre{/if}
+  </button>
+</form>
+{#if newUrl !== '' && !addValid}
+  <p class="-mt-3 mb-4 text-xs text-error">
+    URL invalide — attendu : https://www.dofus-touch.com/fr/mmorpg/encyclopedie/…
+  </p>
+{/if}
+{#if addError}
+  <div class="alert alert-warning mb-4 text-sm">{addError}</div>
+{/if}
 
 {#if tracked.length > 0 && search.trim().length < 2}
   <a href="#/prix/session" class="btn btn-primary btn-lg mb-4 w-full">
