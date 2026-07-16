@@ -11,8 +11,9 @@
   const allItems = useLiveQuery(() => db.items.toArray(), [])
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
 
+  import { pricesView } from '../lib/stores/pricesView.svelte'
+
   let search = $state('')
-  let openLetter = $state<string | null>(null)
 
   // Section « Suivies » repliable, choix mémorisé (liste potentiellement longue).
   const TRACKED_OPEN_KEY = 'dofus-craft:prices-tracked-open'
@@ -168,8 +169,9 @@
         <div class="collapse collapse-arrow bg-base-100 shadow-sm">
           <input
             type="checkbox"
-            checked={openLetter === letter}
-            onchange={() => (openLetter = openLetter === letter ? null : letter)}
+            checked={pricesView.openLetter === letter}
+            onchange={() =>
+              (pricesView.openLetter = pricesView.openLetter === letter ? null : letter)}
           />
           <div class="collapse-title font-bold">
             {letter}

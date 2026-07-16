@@ -48,6 +48,11 @@
 
   const history = $derived([...entries.value].sort((a, b) => b.recordedAt - a.recordedAt))
 
+  const lastLotPrice = $derived((lot: LotSize) => {
+    const points = series[lot]
+    return points.length > 0 ? points[points.length - 1].lot : null
+  })
+
   async function addEntry(lotSize: LotSize, lotPrice: number) {
     await db.priceEntries.add({ itemId: id, lotSize, lotPrice, recordedAt: Date.now() })
   }
@@ -74,7 +79,7 @@
 
 <div class="card bg-base-100 shadow-sm mb-4">
   <div class="card-body py-4">
-    <PriceEntryForm onAdd={addEntry} />
+    <PriceEntryForm onAdd={addEntry} {lastLotPrice} />
   </div>
 </div>
 

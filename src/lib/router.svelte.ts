@@ -43,10 +43,18 @@ function parseHash(hash: string): Route {
   return { name: 'projets', params: {} }
 }
 
+const scrollKey = (hash: string) => hash.replace(/^#\/?/, '').replace(/\/$/, '') || '/'
+
 function createRouter() {
   let current = $state<Route>(parseHash(location.hash))
+  // Position de scroll retenue par route, pour la restaurer au retour arrière.
+  const scrollPositions = new Map<string, number>()
 
-  window.addEventListener('hashchange', () => {
+  window.addEventListener('hashchange', (e) => {
+    // Au moment du hashchange, la page sortante est encore rendue : on
+    // enregistre sa position sous son ancien hash.
+    const oldHash = e.oldURL.includes('#') ? '#' + e.oldURL.split('#')[1] : '#/'
+    scrollPositions.set(scrollKey(oldHash), window.scrollY)
     current = parseHash(location.hash)
   })
 
@@ -56,6 +64,10 @@ function createRouter() {
     },
     go(path: string) {
       location.hash = path.startsWith('#') ? path : `#/${path.replace(/^\//, '')}`
+    },
+    /** Position de scroll mémorisée pour un hash (0 si aucune). */
+    savedScroll(hash: string = location.hash): number {
+      return scrollPositions.get(scrollKey(hash)) ?? 0
     },
   }
 }

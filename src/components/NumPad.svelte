@@ -1,18 +1,28 @@
 <script lang="ts">
   /**
-   * Pavé numérique intégré : remplace le clavier iOS pendant la session
-   * HDV (aucun input natif → aucun problème de focus/viewport, grosses
-   * touches fixes en bas d'écran).
+   * Pavé numérique intégré : remplace le clavier iOS pour la saisie des prix
+   * (aucun input natif → aucun problème de focus/viewport, grosses touches
+   * fixes). Les boutons « passer » sont optionnels (utilisés en session HDV,
+   * masqués sur la fiche d'une ressource).
    */
   interface Props {
     onDigit: (d: string) => void
     onErase: () => void
     onOk: () => void
-    onSkipLot: () => void
-    onSkipItem: () => void
+    okLabel?: string
     okDisabled?: boolean
+    onSkipLot?: () => void
+    onSkipItem?: () => void
   }
-  let { onDigit, onErase, onOk, onSkipLot, onSkipItem, okDisabled = false }: Props = $props()
+  let {
+    onDigit,
+    onErase,
+    onOk,
+    okLabel = 'OK ▸',
+    okDisabled = false,
+    onSkipLot,
+    onSkipItem,
+  }: Props = $props()
 
   const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '000', '0']
 </script>
@@ -26,14 +36,26 @@
       class="btn btn-primary h-14 text-lg"
       onclick={onOk}
       disabled={okDisabled}
-      aria-label="Relever ce prix"
+      aria-label="Valider ce prix"
     >
-      OK ▸
+      {okLabel}
     </button>
   </div>
   <div class="flex w-28 flex-col gap-2">
-    <button class="btn h-14 text-xl" onclick={onErase} aria-label="Effacer">⌫</button>
-    <button class="btn h-14 text-sm" onclick={onSkipLot}>Passer<br />lot ▸</button>
-    <button class="btn h-14 text-sm btn-outline" onclick={onSkipItem}>Ressource<br />suiv. ▸</button>
+    <button
+      class="btn text-xl {onSkipLot || onSkipItem ? 'h-14' : 'flex-1'}"
+      onclick={onErase}
+      aria-label="Effacer"
+    >
+      ⌫
+    </button>
+    {#if onSkipLot}
+      <button class="btn h-14 text-sm" onclick={onSkipLot}>Passer<br />lot ▸</button>
+    {/if}
+    {#if onSkipItem}
+      <button class="btn h-14 text-sm btn-outline" onclick={onSkipItem}>
+        Ressource<br />suiv. ▸
+      </button>
+    {/if}
   </div>
 </div>

@@ -15,6 +15,26 @@
 
   const route = $derived(router.route)
 
+  // Restaure la position de scroll au changement de route (retour arrière) ou
+  // remonte en haut sur une nouvelle page. La liste étant remplie de façon
+  // asynchrone (Dexie), on réessaie sur quelques frames jusqu'à atteindre la
+  // cible ou expiration.
+  let restoreToken = 0
+  $effect(() => {
+    void route // dépendance : ré-exécute à chaque navigation
+    const target = router.savedScroll()
+    const myToken = ++restoreToken
+    let frames = 0
+    const step = () => {
+      if (myToken !== restoreToken) return
+      window.scrollTo(0, target)
+      if (target > 0 && Math.abs(window.scrollY - target) > 2 && frames++ < 40) {
+        requestAnimationFrame(step)
+      }
+    }
+    requestAnimationFrame(step)
+  })
+
   // « Projets » ramène au dernier projet consulté ; la flèche ← du projet
   // ramène à la liste pour en changer.
   const projetsHash = $derived(
