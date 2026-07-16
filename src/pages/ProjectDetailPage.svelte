@@ -6,15 +6,34 @@
   import { applyCraft } from '../lib/needs/craft'
   import { buildDisplayTree } from '../lib/needs/tree'
   import { expandCraftTree, type ExpandProgress } from '../lib/fetch/expand'
+  import type { Project } from '../lib/types'
   import AddTargetForm from '../components/AddTargetForm.svelte'
   import CraftTreeNode from '../components/CraftTreeNode.svelte'
   import FetchProgressModal from '../components/FetchProgressModal.svelte'
   import EmptyState from '../components/EmptyState.svelte'
 
+  import { lastProject } from '../lib/stores/lastProject.svelte'
+  import { router } from '../lib/router.svelte'
+
   let { projectId }: { projectId: string } = $props()
   const pid = $derived(Number(projectId))
 
-  const project = useLiveQuery(() => db.projects.get(Number(projectId)), undefined)
+  // undefined = chargement, null = projet inexistant (supprimé, import…).
+  const project = useLiveQuery<Project | null | undefined>(
+    async () => (await db.projects.get(Number(projectId))) ?? null,
+    undefined,
+  )
+
+  // Mémorise le projet pour que l'onglet « Projets » du dock y revienne ;
+  // s'il n'existe plus, oublie-le et reviens à la liste.
+  $effect(() => {
+    if (project.value === null) {
+      lastProject.clear(pid)
+      router.go('/')
+    } else if (project.value?.id !== undefined) {
+      lastProject.set(project.value.id)
+    }
+  })
   const targets = useLiveQuery(
     () => db.projectTargets.where({ projectId: Number(projectId) }).toArray(),
     [],
@@ -37,7 +56,15 @@
   const tree = $derived(buildDisplayTree(catalog, targetList))
   const shopping = $derived(
     needs.shopping
-      .map((s) => ({ ...s, item: items.get(s.itemId) }))
+      .map((s) => {
+        const need = needs.byItem.get(s.itemId)
+        return {
+          ...s,
+          item: items.get(s.itemId),
+          owned: need?.owned ?? 0,
+          required: need?.required ?? s.qty,
+        }
+      })
       .sort((a, b) => b.qty - a.qty),
   )
 
@@ -218,7 +245,12 @@
         {:else}
           <table class="table">
             <thead>
-              <tr><th>Ressource</th><th class="text-right">Manquant</th><th></th></tr>
+              <tr>
+                <th>Ressource</th>
+                <th class="text-right">Possédé</th>
+                <th class="text-right">Reste à obtenir</th>
+                <th></th>
+              </tr>
             </thead>
             <tbody>
               {#each shopping as s (s.itemId)}
@@ -229,7 +261,18 @@
                       <span class="badge badge-error badge-sm ml-1">introuvable</span>
                     {/if}
                   </td>
-                  <td class="text-right font-mono font-bold">{s.qty}</td>
+                  <td class="text-right">
+                    <div class="font-mono whitespace-nowrap">
+                      <span class="font-bold">{s.owned}</span>
+                      <span class="text-base-content/45">/ {s.required}</span>
+                    </div>
+                    <progress
+                      class="progress progress-warning h-1 w-14"
+                      value={Math.min(s.owned, s.required)}
+                      max={Math.max(s.required, 1)}
+                    ></progress>
+                  </td>
+                  <td class="text-right font-mono font-bold whitespace-nowrap">{s.qty}</td>
                   <td class="text-right">
                     <a href={`#/prix/${s.itemId}`} class="btn btn-ghost btn-xs">prix</a>
                   </td>

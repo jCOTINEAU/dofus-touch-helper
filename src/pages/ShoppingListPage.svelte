@@ -26,8 +26,8 @@
       return computeNeeds(catalog, targets, states)
     })
     return [...computeGlobalShopping(results).entries()]
-      .map(([itemId, qty]) => ({ itemId, qty, item: items.get(itemId) }))
-      .sort((a, b) => b.qty - a.qty)
+      .map(([itemId, line]) => ({ itemId, ...line, item: items.get(itemId) }))
+      .sort((a, b) => b.remaining - a.remaining)
   })
 </script>
 
@@ -46,7 +46,12 @@
     <div class="card-body py-4">
       <table class="table">
         <thead>
-          <tr><th>Ressource</th><th class="text-right">Quantité</th><th></th></tr>
+          <tr>
+            <th>Ressource</th>
+            <th class="text-right">Possédé</th>
+            <th class="text-right">Reste à obtenir</th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
           {#each rows as row (row.itemId)}
@@ -57,7 +62,18 @@
                   <span class="badge badge-error badge-sm ml-1">introuvable</span>
                 {/if}
               </td>
-              <td class="text-right font-mono font-bold">{row.qty}</td>
+              <td class="text-right">
+                <div class="font-mono whitespace-nowrap">
+                  <span class="font-bold">{row.owned}</span>
+                  <span class="text-base-content/45">/ {row.required}</span>
+                </div>
+                <progress
+                  class="progress progress-warning h-1 w-14"
+                  value={Math.min(row.owned, row.required)}
+                  max={Math.max(row.required, 1)}
+                ></progress>
+              </td>
+              <td class="text-right font-mono font-bold whitespace-nowrap">{row.remaining}</td>
               <td class="text-right">
                 <a href={`#/prix/${row.itemId}`} class="btn btn-ghost btn-xs">prix</a>
               </td>

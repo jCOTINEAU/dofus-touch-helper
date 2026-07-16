@@ -2,6 +2,7 @@
   import { db } from '../lib/db/db'
   import { useLiveQuery } from '../lib/stores/liveQuery.svelte'
   import { router } from '../lib/router.svelte'
+  import { lastProject } from '../lib/stores/lastProject.svelte'
   import EmptyState from '../components/EmptyState.svelte'
 
   const projects = useLiveQuery(() => db.projects.toArray(), [])
@@ -30,6 +31,7 @@
       await db.projectTargets.where({ projectId: id }).delete()
       await db.nodeStates.where({ projectId: id }).delete()
     })
+    lastProject.clear(id)
   }
 </script>
 

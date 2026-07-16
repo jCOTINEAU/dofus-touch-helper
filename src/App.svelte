@@ -10,16 +10,22 @@
   import SettingsPage from './pages/SettingsPage.svelte'
   import DebugPage from './pages/DebugPage.svelte'
   import { swUpdate } from './lib/stores/swUpdate.svelte'
+  import { lastProject } from './lib/stores/lastProject.svelte'
 
   const route = $derived(router.route)
 
-  const navItems = [
-    { hash: '#/', name: 'projets', label: 'Projets', match: ['projets', 'projet'] },
+  // « Projets » ramène au dernier projet consulté ; la flèche ← du projet
+  // ramène à la liste pour en changer.
+  const projetsHash = $derived(
+    lastProject.value !== null ? `#/projets/${lastProject.value}` : '#/',
+  )
+  const navItems = $derived([
+    { hash: projetsHash, name: 'projets', label: 'Projets', match: ['projets', 'projet'] },
     { hash: '#/courses', name: 'courses', label: 'Courses', match: ['courses'] },
     { hash: '#/prix', name: 'prix', label: 'Prix', match: ['prix', 'prixDetail'] },
     { hash: '#/combats', name: 'combats', label: 'Combats', match: ['combats', 'combatDetail'] },
     { hash: '#/reglages', name: 'reglages', label: 'Réglages', match: ['reglages'] },
-  ]
+  ])
 </script>
 
 <div class="min-h-screen bg-base-200 pb-24">
