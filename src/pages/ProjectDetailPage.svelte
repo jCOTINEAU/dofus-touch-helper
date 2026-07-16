@@ -181,10 +181,19 @@
   }
 </script>
 
-<div class="flex items-center gap-2 mb-4">
+<div class="flex items-center gap-2 mb-1">
   <a href="#/" class="btn btn-ghost btn-square text-xl" aria-label="Retour aux projets">←</a>
   <h1 class="text-2xl font-bold flex-1">{project.value?.name ?? '…'}</h1>
 </div>
+<label class="mb-4 ml-14 flex w-fit cursor-pointer items-center gap-2 text-sm text-base-content/70">
+  <input
+    type="checkbox"
+    class="toggle toggle-sm toggle-primary"
+    checked={project.value ? project.value.includeInShopping !== false : true}
+    onchange={(e) => db.projects.update(pid, { includeInShopping: e.currentTarget.checked })}
+  />
+  Compter dans les courses globales
+</label>
 
 <div class="card bg-base-100 shadow-sm mb-4">
   <div class="card-body py-4">

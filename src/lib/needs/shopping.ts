@@ -2,6 +2,11 @@
 
 import type { NeedsResult } from './needs'
 
+/** Un projet compte dans les courses globales sauf refus explicite. */
+export function projectCountsInShopping(project: { includeInShopping?: boolean }): boolean {
+  return project.includeInShopping !== false
+}
+
 export interface ShoppingLine {
   /** Reste à obtenir (cumulé). */
   remaining: number

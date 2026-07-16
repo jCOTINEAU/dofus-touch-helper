@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { computeNeeds } from './needs'
-import { computeGlobalShopping } from './shopping'
+import { computeGlobalShopping, projectCountsInShopping } from './shopping'
 import { RING_CATALOG, makeStates } from './__fixtures__/catalogs'
 
 describe('computeGlobalShopping', () => {
@@ -24,5 +24,14 @@ describe('computeGlobalShopping', () => {
 
   it('aucun projet : liste vide', () => {
     expect(computeGlobalShopping([]).size).toBe(0)
+  })
+})
+
+describe('projectCountsInShopping', () => {
+  it('true par défaut (champ absent = anciens projets), false seulement si explicite', () => {
+    expect(projectCountsInShopping({})).toBe(true)
+    expect(projectCountsInShopping({ includeInShopping: true })).toBe(true)
+    expect(projectCountsInShopping({ includeInShopping: undefined })).toBe(true)
+    expect(projectCountsInShopping({ includeInShopping: false })).toBe(false)
   })
 })

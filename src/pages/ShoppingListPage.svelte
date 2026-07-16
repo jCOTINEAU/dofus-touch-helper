@@ -3,7 +3,7 @@
   import { useLiveQuery } from '../lib/stores/liveQuery.svelte'
   import { setNodeOwned, toCatalogEntry } from '../lib/db/repo'
   import { computeNeeds } from '../lib/needs/needs'
-  import { computeGlobalShopping } from '../lib/needs/shopping'
+  import { computeGlobalShopping, projectCountsInShopping } from '../lib/needs/shopping'
   import { recentMedianUnit } from '../lib/prices/stats'
   import { formatKamas } from '../lib/prices/format'
   import { makeFarmAdvisor } from '../lib/combats/farming'
@@ -45,7 +45,7 @@
 
   const rows = $derived.by(() => {
     const catalog = new Map(allItems.value.map((i) => [i.id, toCatalogEntry(i)]))
-    const perProject = projects.value.map((p) => {
+    const perProject = projects.value.filter(projectCountsInShopping).map((p) => {
       const targets = allTargets.value
         .filter((t) => t.projectId === p.id)
         .map((t) => ({ itemId: t.itemId, qty: t.qty }))
@@ -93,6 +93,10 @@
 
   const farmAdviceFor = $derived(makeFarmAdvisor(allCombats.value, allLoots.value, priceOf))
 
+  const excludedCount = $derived(
+    projects.value.filter((p) => !projectCountsInShopping(p)).length,
+  )
+
   let openItem = $state<number | null>(null)
 </script>
 
@@ -100,6 +104,11 @@
 <p class="text-sm text-base-content/60 mb-4">
   Tout ce qu'il manque, cumulé sur l'ensemble des projets. Touche une ligne pour saisir le stock
   projet par projet.
+  {#if excludedCount > 0}
+    <span class="text-base-content/40">
+      ({excludedCount} projet(s) exclu(s) des courses globales)
+    </span>
+  {/if}
 </p>
 
 {#if rows.length === 0}

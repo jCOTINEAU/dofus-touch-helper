@@ -35,6 +35,12 @@ export interface Project {
   id?: number
   name: string
   createdAt: number
+  /**
+   * Compter ce projet dans la liste de courses globale (défaut true —
+   * absent sur les projets créés avant l'ajout du champ). false pour les
+   * projets « parking » servant juste à référencer des ressources.
+   */
+  includeInShopping?: boolean
 }
 
 /** Objet cible d'un projet (ce qu'on veut crafter). */

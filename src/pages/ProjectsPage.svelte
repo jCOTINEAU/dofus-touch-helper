@@ -59,7 +59,12 @@
       <div class="card bg-base-100 shadow-sm">
         <div class="card-body flex-row items-center justify-between py-4">
           <a href={`#/projets/${project.id}`} class="flex-1">
-            <h2 class="card-title text-base">{project.name}</h2>
+            <h2 class="card-title text-base">
+              {project.name}
+              {#if project.includeInShopping === false}
+                <span class="badge badge-ghost badge-sm">hors courses</span>
+              {/if}
+            </h2>
             <p class="text-sm text-base-content/50">
               {targetCounts.value.get(project.id!) ?? 0} objet(s) cible(s)
             </p>
