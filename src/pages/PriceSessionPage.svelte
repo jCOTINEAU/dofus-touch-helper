@@ -62,6 +62,12 @@
     selected = next
   }
 
+  // Reprise d'une tournée : ne garder que cet objet et tous ceux d'après
+  // (dans l'ordre alphabétique = l'ordre de la session).
+  function resumeFrom(index: number) {
+    selected = new Set(tracked.slice(index).map((i) => i.id))
+  }
+
   // --- Phase 2 : saisie ---
   let session = $state<SessionState | null>(null)
   let typed = $state('')
@@ -172,12 +178,20 @@
             </button>
           </div>
         </div>
+        <p class="text-xs text-base-content/50">
+          Astuce : <strong>double-tape</strong> un objet pour ne garder que lui et les suivants
+          (reprendre une tournée interrompue).
+        </p>
         <div class="flex flex-col divide-y divide-base-200">
-          {#each tracked as item (item.id)}
+          {#each tracked as item, i (item.id)}
             {@const entries = entriesByItem.get(item.id) ?? []}
             {@const last = entries.reduce((m, e) => Math.max(m, e.recordedAt), 0)}
             {@const stale = Date.now() - last > 3 * 24 * 3600 * 1000}
-            <label class="flex min-h-12 cursor-pointer items-center gap-3 py-2">
+            <label
+              class="flex min-h-12 cursor-pointer touch-manipulation items-center gap-3 py-2 select-none"
+              ondblclick={() => resumeFrom(i)}
+              title="Double-tape pour reprendre à partir d'ici"
+            >
               <input
                 type="checkbox"
                 class="checkbox checkbox-primary"
