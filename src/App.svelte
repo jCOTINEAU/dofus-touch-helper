@@ -7,6 +7,9 @@
   import PriceDetailPage from './pages/PriceDetailPage.svelte'
   import CombatsPage from './pages/CombatsPage.svelte'
   import CombatDetailPage from './pages/CombatDetailPage.svelte'
+  import FarmSessionPage from './pages/FarmSessionPage.svelte'
+  import FarmHistoryPage from './pages/FarmHistoryPage.svelte'
+  import MonstersHidePage from './pages/MonstersHidePage.svelte'
   import SettingsPage from './pages/SettingsPage.svelte'
   import PriceSessionPage from './pages/PriceSessionPage.svelte'
   import DebugPage from './pages/DebugPage.svelte'
@@ -60,7 +63,12 @@
     { hash: projetsHash, name: 'projets', label: 'Projets', match: ['projets', 'projet'] },
     { hash: '#/courses', name: 'courses', label: 'Courses', match: ['courses'] },
     { hash: '#/prix', name: 'prix', label: 'Prix', match: ['prix', 'prixDetail', 'prixSession'] },
-    { hash: '#/combats', name: 'combats', label: 'Combats', match: ['combats', 'combatDetail'] },
+    {
+      hash: '#/combats',
+      name: 'combats',
+      label: 'Combats',
+      match: ['combats', 'combatDetail', 'farmSession', 'farmHistory', 'monstersHide'],
+    },
     { hash: '#/reglages', name: 'reglages', label: 'Réglages', match: ['reglages'] },
   ])
 </script>
@@ -89,6 +97,12 @@
       {/key}
     {:else if route.name === 'combats'}
       <CombatsPage />
+    {:else if route.name === 'farmSession'}
+      <FarmSessionPage />
+    {:else if route.name === 'farmHistory'}
+      <FarmHistoryPage />
+    {:else if route.name === 'monstersHide'}
+      <MonstersHidePage />
     {:else if route.name === 'combatDetail'}
       {#key route.params.id}
         <CombatDetailPage combatId={route.params.id} />

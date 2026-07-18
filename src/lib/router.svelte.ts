@@ -17,6 +17,10 @@ const patterns: { pattern: string; name: string }[] = [
   { pattern: 'prix/session', name: 'prixSession' },
   { pattern: 'prix/:itemId', name: 'prixDetail' },
   { pattern: 'combats', name: 'combats' },
+  // Avant combats/:id (premier motif gagnant).
+  { pattern: 'combats/session', name: 'farmSession' },
+  { pattern: 'combats/historique', name: 'farmHistory' },
+  { pattern: 'combats/masques', name: 'monstersHide' },
   { pattern: 'combats/:id', name: 'combatDetail' },
   { pattern: 'reglages', name: 'reglages' },
   { pattern: 'debug', name: 'debug' },

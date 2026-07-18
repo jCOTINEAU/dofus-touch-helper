@@ -13,6 +13,11 @@ const monster = (id: number, drops: [number, number, boolean?][]): CachedMonster
   url: `u${id}`,
   name: `m${id}`,
   imageUrl: null,
+  family: null,
+  familyId: null,
+  levelMin: null,
+  levelMax: null,
+  imported: true,
   drops: drops.map(([itemId, dropRatePct, conditional]) => ({
     itemId,
     name: `item${itemId}`,

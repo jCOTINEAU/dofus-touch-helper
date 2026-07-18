@@ -104,7 +104,20 @@ export interface CachedMonster {
   url: string
   name: string
   imageUrl: string | null
+  /** Race / famille affichée sur la page (ex. « Bouftous »). */
+  family: string | null
+  /** Id de catégorie (monster_category), pour regrouper. */
+  familyId: number | null
+  levelMin: number | null
+  levelMax: number | null
   drops: MonsterDrop[]
+  /**
+   * false = « frère » enregistré depuis un autre monstre, sans ses drops :
+   * à fetcher (import à la volée) avant de pouvoir combattre avec.
+   */
+  imported: boolean
+  /** Masqué de la sélection (géré depuis la page dédiée). */
+  hidden?: boolean
   fetchedAt: number
 }
 
@@ -114,4 +127,29 @@ export interface CombatCreature {
   combatId: number
   monsterId: number
   count: number
+}
+
+/** Composition d'un combat mesuré (snapshot). */
+export interface CreatureCount {
+  monsterId: number
+  count: number
+}
+
+/** Session de farm chronométrée. */
+export interface FarmSession {
+  id?: number
+  startedAt: number
+  endedAt?: number
+}
+
+/** Combat mesuré au sein d'une session de farm. */
+export interface SessionCombat {
+  id?: number
+  sessionId: number
+  /** Durée du combat (s). */
+  durationSec: number
+  /** Temps d'exploration avant ce combat (s). */
+  idleBeforeSec: number
+  creatures: CreatureCount[]
+  recordedAt: number
 }

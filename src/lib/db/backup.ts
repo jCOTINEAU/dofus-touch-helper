@@ -15,6 +15,8 @@ const TABLES = [
   'combatLoots',
   'monsters',
   'combatCreatures',
+  'farmSessions',
+  'sessionCombats',
   'meta',
 ] as const
 

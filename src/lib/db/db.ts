@@ -5,10 +5,12 @@ import type {
   Combat,
   CombatCreature,
   CombatLoot,
+  FarmSession,
   NodeState,
   PriceEntry,
   Project,
   ProjectTarget,
+  SessionCombat,
 } from '../types'
 
 export type AppDatabase = Dexie & {
@@ -21,6 +23,8 @@ export type AppDatabase = Dexie & {
   combatLoots: EntityTable<CombatLoot, 'id'>
   monsters: EntityTable<CachedMonster, 'id'>
   combatCreatures: EntityTable<CombatCreature, 'id'>
+  farmSessions: EntityTable<FarmSession, 'id'>
+  sessionCombats: EntityTable<SessionCombat, 'id'>
   meta: Table<{ key: string; value: unknown }, string>
 }
 
@@ -41,4 +45,10 @@ db.version(1).stores({
 db.version(2).stores({
   monsters: 'id, name',
   combatCreatures: '++id, combatId, monsterId',
+})
+
+// v3 : sessions de farm chronométrées.
+db.version(3).stores({
+  farmSessions: '++id, startedAt',
+  sessionCombats: '++id, sessionId',
 })

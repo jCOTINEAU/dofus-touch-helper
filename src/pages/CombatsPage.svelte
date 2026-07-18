@@ -73,6 +73,13 @@
 
 <h1 class="text-2xl font-bold mb-4">Combats</h1>
 
+<div class="mb-4 flex flex-wrap gap-2">
+  <a href="#/combats/session" class="btn btn-primary flex-1">
+    ▶ Session de farm (rentabilité chronométrée)
+  </a>
+  <a href="#/combats/historique" class="btn btn-outline">Historique</a>
+</div>
+
 <div class="mb-4">
   <GlobalModsBar />
 </div>

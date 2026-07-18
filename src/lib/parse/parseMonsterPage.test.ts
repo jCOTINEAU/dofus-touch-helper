@@ -13,6 +13,13 @@ describe('parseMonsterPage', () => {
     const m = parseMonsterPage(fixture('monstre-bouftou.md'), `${BASE}/101-bouftou`)
     expect(m.id).toBe(101)
     expect(m.name).toBe('Bouftou')
+    expect(m.family).toBe('Bouftous')
+    expect(m.familyId).toBe(9)
+    expect(m.levelMin).toBe(51)
+    expect(m.levelMax).toBe(55)
+    // Frères de la même famille (nom + id), sans drops.
+    expect(m.siblings.map((s) => s.id)).toEqual(expect.arrayContaining([1232, 134, 149]))
+    expect(m.siblings.find((s) => s.id === 134)?.name).toBe('Boufton Blanc')
 
     const regular = m.drops.filter((d) => !d.conditional)
     expect(regular.map((d) => [d.itemId, d.name, d.dropRatePct])).toEqual([
