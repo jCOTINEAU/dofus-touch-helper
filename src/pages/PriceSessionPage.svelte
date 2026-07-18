@@ -17,11 +17,17 @@
     type SessionState,
   } from '../lib/prices/session'
   import { formatKamas, formatRelativeTime } from '../lib/prices/format'
+  import { toCatalogEntry } from '../lib/db/repo'
+  import { computeNeeds } from '../lib/needs/needs'
   import ItemAvatar from '../components/ItemAvatar.svelte'
   import NumPad from '../components/NumPad.svelte'
+  import type { CachedItem } from '../lib/types'
 
   const allItems = useLiveQuery(() => db.items.toArray(), [])
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
+  const allProjects = useLiveQuery(() => db.projects.toArray(), [])
+  const allTargets = useLiveQuery(() => db.projectTargets.toArray(), [])
+  const allStates = useLiveQuery(() => db.nodeStates.toArray(), [])
 
   const items = $derived(new Map(allItems.value.map((i) => [i.id, i])))
 
@@ -35,25 +41,106 @@
     return map
   })
 
-  /** Ressources suivies, triées comme l'HDV (alphabétique fr). */
-  const tracked = $derived(
-    allItems.value
-      .filter((i) => entriesByItem.has(i.id))
-      .sort((a, b) => a.name.localeCompare(b.name, 'fr')),
-  )
+  const byName = (a: { name: string }, b: { name: string }) =>
+    a.name.localeCompare(b.name, 'fr')
 
   // --- Phase 1 : sélection des ressources de la tournée ---
   let phase = $state<'select' | 'entry' | 'done'>('select')
   let selected = $state<Set<number>>(new Set())
   let initialized = $state(false)
 
+  // Filtre par projet(s). Vide = toutes les ressources suivies.
+  let projectFilter = $state<Set<number>>(new Set())
+  // En mode projet, ignorer les ressources déjà au complet (reste 0).
+  let skipComplete = $state(true)
+
+  interface Candidate {
+    item: CachedItem
+    lastAt: number
+    /** Reste à obtenir cumulé sur les projets filtrés (mode projet). */
+    remaining: number | null
+  }
+
+  /** Ressources suivies (≥ 1 relevé), triées comme l'HDV. */
+  const trackedCandidates = $derived<Candidate[]>(
+    allItems.value
+      .filter((i) => entriesByItem.has(i.id))
+      .map((item) => ({
+        item,
+        lastAt: (entriesByItem.get(item.id) ?? []).reduce((m, e) => Math.max(m, e.recordedAt), 0),
+        remaining: null,
+      }))
+      .sort((a, b) => byName(a.item, b.item)),
+  )
+
+  /** Ressources (feuilles du plan) des projets filtrés, avec reste cumulé. */
+  const projectCandidates = $derived.by<Candidate[]>(() => {
+    if (projectFilter.size === 0) return []
+    const catalog = new Map(allItems.value.map((i) => [i.id, toCatalogEntry(i)]))
+    const remainingById = new Map<number, number>()
+    for (const p of allProjects.value) {
+      if (!projectFilter.has(p.id!)) continue
+      const targets = allTargets.value
+        .filter((t) => t.projectId === p.id)
+        .map((t) => ({ itemId: t.itemId, qty: t.qty }))
+      const states = new Map(
+        allStates.value
+          .filter((s) => s.projectId === p.id)
+          .map((s) => [s.itemId, { mode: s.mode, owned: s.owned }]),
+      )
+      const needs = computeNeeds(catalog, targets, states)
+      for (const n of needs.byItem.values()) {
+        if (!n.isLeafInPlan) continue // on ne price que ce qu'on achète
+        remainingById.set(n.itemId, (remainingById.get(n.itemId) ?? 0) + n.remaining)
+      }
+    }
+    const out: Candidate[] = []
+    for (const [itemId, remaining] of remainingById) {
+      if (skipComplete && remaining === 0) continue
+      const item = items.get(itemId)
+      if (!item) continue // ressource non encore en cache (expansion incomplète)
+      out.push({
+        item,
+        lastAt: (entriesByItem.get(itemId) ?? []).reduce((m, e) => Math.max(m, e.recordedAt), 0),
+        remaining,
+      })
+    }
+    return out.sort((a, b) => byName(a.item, b.item))
+  })
+
+  const candidates = $derived(
+    projectFilter.size === 0 ? trackedCandidates : projectCandidates,
+  )
+
   $effect(() => {
     // Pré-coche tout à l'arrivée (une fois les données chargées).
-    if (!initialized && tracked.length > 0) {
-      selected = new Set(tracked.map((i) => i.id))
+    if (!initialized && candidates.length > 0) {
+      selected = new Set(candidates.map((c) => c.item.id))
       initialized = true
     }
   })
+
+  function selectAllCandidates() {
+    selected = new Set(candidates.map((c) => c.item.id))
+  }
+
+  function toggleProject(id: number) {
+    const next = new Set(projectFilter)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    projectFilter = next
+    selectAllCandidates()
+  }
+
+  function useAllTracked() {
+    projectFilter = new Set()
+    selectAllCandidates()
+  }
+
+  function setSkipComplete(v: boolean) {
+    skipComplete = v
+    selectAllCandidates()
+  }
 
   function toggle(id: number) {
     const next = new Set(selected)
@@ -65,7 +152,7 @@
   // Reprise d'une tournée : ne garder que cet objet et tous ceux d'après
   // (dans l'ordre alphabétique = l'ordre de la session).
   function resumeFrom(index: number) {
-    selected = new Set(tracked.slice(index).map((i) => i.id))
+    selected = new Set(candidates.slice(index).map((c) => c.item.id))
   }
 
   // --- Phase 2 : saisie ---
@@ -76,12 +163,12 @@
   let recorded = $state<Map<string, { lotPrice: number; variationPct: number | null }>>(new Map())
 
   function start() {
-    const sessionItems = tracked
-      .filter((i) => selected.has(i.id))
-      .map((i) => {
-        const series = seriesByLot(entriesByItem.get(i.id) ?? [])
+    const sessionItems = candidates
+      .filter((c) => selected.has(c.item.id))
+      .map((c) => {
+        const series = seriesByLot(entriesByItem.get(c.item.id) ?? [])
         const lots = LOT_SIZES.filter((s) => series[s].length > 0)
-        return { itemId: i.id, lots: lots.length > 0 ? lots : [...LOT_SIZES] }
+        return { itemId: c.item.id, lots: lots.length > 0 ? lots : [...LOT_SIZES] }
       })
     session = startSession(sessionItems)
     typed = ''
@@ -152,7 +239,7 @@
     <h1 class="text-2xl font-bold flex-1">Session HDV</h1>
   </div>
 
-  {#if tracked.length === 0}
+  {#if trackedCandidates.length === 0 && allProjects.value.length === 0}
     <div class="card bg-base-100 shadow-sm">
       <div class="card-body">
         <p class="text-base-content/60">
@@ -162,17 +249,46 @@
       </div>
     </div>
   {:else}
+    <!-- Source : toutes les suivies, ou les ressources d'un/plusieurs projets -->
+    <div class="card bg-base-100 shadow-sm mb-4">
+      <div class="card-body py-3 gap-2">
+        <span class="text-xs font-semibold text-base-content/60 uppercase">Source</span>
+        <div class="flex flex-wrap gap-2">
+          <button
+            class="btn btn-sm {projectFilter.size === 0 ? 'btn-primary' : 'btn-outline'}"
+            onclick={useAllTracked}
+          >
+            Toutes les suivies
+          </button>
+          {#each allProjects.value as p (p.id)}
+            <button
+              class="btn btn-sm {projectFilter.has(p.id!) ? 'btn-primary' : 'btn-outline'}"
+              onclick={() => toggleProject(p.id!)}
+            >
+              {p.name}
+            </button>
+          {/each}
+        </div>
+        {#if projectFilter.size > 0}
+          <label class="flex cursor-pointer items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              class="toggle toggle-sm toggle-primary"
+              checked={skipComplete}
+              onchange={(e) => setSkipComplete(e.currentTarget.checked)}
+            />
+            Ignorer les ressources déjà complètes (reste 0)
+          </label>
+        {/if}
+      </div>
+    </div>
+
     <div class="card bg-base-100 shadow-sm mb-4">
       <div class="card-body py-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <h2 class="font-semibold">Ressources de la tournée ({selected.size}/{tracked.length})</h2>
+          <h2 class="font-semibold">Ressources de la tournée ({selected.size}/{candidates.length})</h2>
           <div class="join">
-            <button
-              class="btn btn-sm join-item"
-              onclick={() => (selected = new Set(tracked.map((i) => i.id)))}
-            >
-              Tout
-            </button>
+            <button class="btn btn-sm join-item" onclick={selectAllCandidates}>Tout</button>
             <button class="btn btn-sm join-item" onclick={() => (selected = new Set())}>
               Rien
             </button>
@@ -182,30 +298,37 @@
           Astuce : <strong>double-tape</strong> un objet pour ne garder que lui et les suivants
           (reprendre une tournée interrompue).
         </p>
-        <div class="flex flex-col divide-y divide-base-200">
-          {#each tracked as item, i (item.id)}
-            {@const entries = entriesByItem.get(item.id) ?? []}
-            {@const last = entries.reduce((m, e) => Math.max(m, e.recordedAt), 0)}
-            {@const stale = Date.now() - last > 3 * 24 * 3600 * 1000}
-            <label
-              class="flex min-h-12 cursor-pointer touch-manipulation items-center gap-3 py-2 select-none"
-              ondblclick={() => resumeFrom(i)}
-              title="Double-tape pour reprendre à partir d'ici"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-primary"
-                checked={selected.has(item.id)}
-                onchange={() => toggle(item.id)}
-              />
-              <ItemAvatar imageUrl={item.imageUrl} name={item.name} size={32} />
-              <span class="flex-1">{item.name}</span>
-              <span class="text-xs {stale ? 'text-warning' : 'text-base-content/40'}">
-                {formatRelativeTime(last, Date.now())}
-              </span>
-            </label>
-          {/each}
-        </div>
+        {#if candidates.length === 0}
+          <p class="py-4 text-center text-sm text-base-content/50">
+            Aucune ressource à relever pour cette source.
+          </p>
+        {:else}
+          <div class="flex flex-col divide-y divide-base-200">
+            {#each candidates as c, i (c.item.id)}
+              {@const stale = Date.now() - c.lastAt > 3 * 24 * 3600 * 1000}
+              <label
+                class="flex min-h-12 cursor-pointer touch-manipulation items-center gap-3 py-2 select-none"
+                ondblclick={() => resumeFrom(i)}
+                title="Double-tape pour reprendre à partir d'ici"
+              >
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  checked={selected.has(c.item.id)}
+                  onchange={() => toggle(c.item.id)}
+                />
+                <ItemAvatar imageUrl={c.item.imageUrl} name={c.item.name} size={32} />
+                <span class="flex-1">{c.item.name}</span>
+                {#if c.remaining !== null}
+                  <span class="badge badge-ghost badge-sm">reste {c.remaining}</span>
+                {/if}
+                <span class="text-xs {stale ? 'text-warning' : 'text-base-content/40'}">
+                  {c.lastAt === 0 ? 'jamais' : formatRelativeTime(c.lastAt, Date.now())}
+                </span>
+              </label>
+            {/each}
+          </div>
+        {/if}
       </div>
     </div>
     <button class="btn btn-primary btn-lg w-full" disabled={selected.size === 0} onclick={start}>
