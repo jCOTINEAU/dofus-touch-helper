@@ -2,13 +2,20 @@
   import { db } from '../lib/db/db'
   import { useLiveQuery } from '../lib/stores/liveQuery.svelte'
   import { combatProfit, rankCombats } from '../lib/combats/profit'
+  import { asLootInputs, combatEffectiveLoots } from '../lib/combats/effectiveLoots'
   import { recentMedianUnit } from '../lib/prices/stats'
+  import { globalMods } from '../lib/stores/globalMods.svelte'
   import { router } from '../lib/router.svelte'
   import EmptyState from '../components/EmptyState.svelte'
+  import GlobalModsBar from '../components/GlobalModsBar.svelte'
 
   const combats = useLiveQuery(() => db.combats.toArray(), [])
   const allLoots = useLiveQuery(() => db.combatLoots.toArray(), [])
+  const allCreatures = useLiveQuery(() => db.combatCreatures.toArray(), [])
+  const allMonsters = useLiveQuery(() => db.monsters.toArray(), [])
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
+
+  const monstersById = $derived(new Map(allMonsters.value.map((m) => [m.id, m])))
 
   const priceOf = $derived.by(() => {
     const byItem = new Map<number, typeof allEntries.value>()
@@ -26,15 +33,18 @@
 
   const ranked = $derived(
     rankCombats(
-      combats.value.map((combat) => ({
-        combat,
-        lootCount: allLoots.value.filter((l) => l.combatId === combat.id).length,
-        profit: combatProfit(
-          combat.avgDurationSec,
-          allLoots.value.filter((l) => l.combatId === combat.id),
-          priceOf,
-        ),
-      })),
+      combats.value.map((combat) => {
+        const creatures = allCreatures.value
+          .filter((c) => c.combatId === combat.id)
+          .map((c) => ({ monsterId: c.monsterId, count: c.count }))
+        const manual = allLoots.value.filter((l) => l.combatId === combat.id)
+        const effective = combatEffectiveLoots(creatures, monstersById, manual, globalMods.value)
+        return {
+          combat,
+          creatureCount: creatures.reduce((n, c) => n + c.count, 0),
+          profit: combatProfit(combat.avgDurationSec, asLootInputs(effective), priceOf),
+        }
+      }),
     ),
   )
 
@@ -51,9 +61,10 @@
 
   async function remove(id: number, name: string) {
     if (!confirm(`Supprimer le combat « ${name} » ?`)) return
-    await db.transaction('rw', [db.combats, db.combatLoots], async () => {
+    await db.transaction('rw', [db.combats, db.combatLoots, db.combatCreatures], async () => {
       await db.combats.delete(id)
       await db.combatLoots.where({ combatId: id }).delete()
+      await db.combatCreatures.where({ combatId: id }).delete()
     })
   }
 
@@ -61,6 +72,10 @@
 </script>
 
 <h1 class="text-2xl font-bold mb-4">Combats</h1>
+
+<div class="mb-4">
+  <GlobalModsBar />
+</div>
 
 <form class="flex gap-2 mb-6" onsubmit={create}>
   <input
@@ -97,7 +112,7 @@
                   {row.combat.name}
                 </a>
                 <div class="text-xs text-base-content/50">
-                  {row.lootCount} loot(s) ·
+                  {row.creatureCount} créature(s) ·
                   {row.combat.avgDurationSec > 0
                     ? `${Math.round(row.combat.avgDurationSec / 60)} min`
                     : 'durée ?'}

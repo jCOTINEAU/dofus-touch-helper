@@ -7,6 +7,8 @@
   import { recentMedianUnit } from '../lib/prices/stats'
   import { formatKamas } from '../lib/prices/format'
   import { makeFarmAdvisor } from '../lib/combats/farming'
+  import { effectiveLootsPerCombat } from '../lib/combats/effectiveLoots'
+  import { globalMods } from '../lib/stores/globalMods.svelte'
   import QtyStepper from '../components/QtyStepper.svelte'
   import EmptyState from '../components/EmptyState.svelte'
   import FarmHint from '../components/FarmHint.svelte'
@@ -18,6 +20,8 @@
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
   const allCombats = useLiveQuery(() => db.combats.toArray(), [])
   const allLoots = useLiveQuery(() => db.combatLoots.toArray(), [])
+  const allCreatures = useLiveQuery(() => db.combatCreatures.toArray(), [])
+  const allMonsters = useLiveQuery(() => db.monsters.toArray(), [])
 
   const items = $derived(new Map(allItems.value.map((i) => [i.id, i])))
 
@@ -96,7 +100,16 @@
   const total = $derived(rows.reduce((sum, r) => sum + (r.lineCost ?? 0), 0))
   const missingPriceCount = $derived(rows.filter((r) => r.lineCost === null).length)
 
-  const farmAdviceFor = $derived(makeFarmAdvisor(allCombats.value, allLoots.value, priceOf))
+  const effectiveLoots = $derived(
+    effectiveLootsPerCombat(
+      allCombats.value,
+      allCreatures.value,
+      allLoots.value,
+      new Map(allMonsters.value.map((m) => [m.id, m])),
+      globalMods.value,
+    ),
+  )
+  const farmAdviceFor = $derived(makeFarmAdvisor(allCombats.value, effectiveLoots, priceOf))
 
   const excludedCount = $derived(
     projects.value.filter((p) => !projectCountsInShopping(p)).length,

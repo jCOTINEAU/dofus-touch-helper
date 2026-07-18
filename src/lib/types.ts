@@ -29,6 +29,12 @@ export interface CachedItem {
   /** 'dead' = page 404 sur l'encyclopédie (objet retiré du jeu). */
   fetchStatus: 'ok' | 'dead'
   fetchedAt: number
+  /**
+   * Item créé comme simple étiquette (nom/url) depuis un drop de monstre,
+   * sans avoir été réellement fetché : à remplacer par le vrai objet dès
+   * qu'on le charge (recette incluse).
+   */
+  stub?: boolean
 }
 
 export interface Project {
@@ -80,4 +86,32 @@ export interface CombatLoot {
   itemId: number
   dropRatePct: number
   qtyPerDrop: number
+}
+
+/** Un drop d'un monstre (taux de base tel qu'affiché dans l'encyclopédie). */
+export interface MonsterDrop {
+  itemId: number
+  name: string
+  url: string
+  dropRatePct: number
+  /** Butin conditionnel (n'apparaît que dans certains cas). */
+  conditional: boolean
+}
+
+/** Monstre mis en cache (table `monsters`, comme les items). */
+export interface CachedMonster {
+  id: number
+  url: string
+  name: string
+  imageUrl: string | null
+  drops: MonsterDrop[]
+  fetchedAt: number
+}
+
+/** Créature attachée à un combat (monstre × nombre d'exemplaires). */
+export interface CombatCreature {
+  id?: number
+  combatId: number
+  monsterId: number
+  count: number
 }

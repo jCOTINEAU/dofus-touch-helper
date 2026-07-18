@@ -10,6 +10,8 @@
   import { costShopping, effectiveCost, type EffectiveCost } from '../lib/prices/costs'
   import { formatKamas } from '../lib/prices/format'
   import { makeFarmAdvisor } from '../lib/combats/farming'
+  import { effectiveLootsPerCombat } from '../lib/combats/effectiveLoots'
+  import { globalMods } from '../lib/stores/globalMods.svelte'
   import FarmHint from '../components/FarmHint.svelte'
   import type { Project } from '../lib/types'
   import AddTargetForm from '../components/AddTargetForm.svelte'
@@ -52,6 +54,8 @@
   const allEntries = useLiveQuery(() => db.priceEntries.toArray(), [])
   const allCombats = useLiveQuery(() => db.combats.toArray(), [])
   const allLoots = useLiveQuery(() => db.combatLoots.toArray(), [])
+  const allCreatures = useLiveQuery(() => db.combatCreatures.toArray(), [])
+  const allMonsters = useLiveQuery(() => db.monsters.toArray(), [])
 
   // Prix unitaire de référence par ressource (médiane récente).
   const priceOf = $derived.by(() => {
@@ -110,7 +114,16 @@
   })
 
   // Conseil farm vs achat (meilleur combat qui loote la ressource).
-  const farmAdviceFor = $derived(makeFarmAdvisor(allCombats.value, allLoots.value, priceOf))
+  const effectiveLoots = $derived(
+    effectiveLootsPerCombat(
+      allCombats.value,
+      allCreatures.value,
+      allLoots.value,
+      new Map(allMonsters.value.map((m) => [m.id, m])),
+      globalMods.value,
+    ),
+  )
+  const farmAdviceFor = $derived(makeFarmAdvisor(allCombats.value, effectiveLoots, priceOf))
 
   let tab = $state<'arbre' | 'courses'>('arbre')
   // Récap des cibles replié par défaut (peut être long) ; s'ouvre s'il est vide.

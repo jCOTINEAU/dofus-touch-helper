@@ -13,6 +13,8 @@ const TABLES = [
   'priceEntries',
   'combats',
   'combatLoots',
+  'monsters',
+  'combatCreatures',
   'meta',
 ] as const
 

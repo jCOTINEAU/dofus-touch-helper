@@ -33,7 +33,9 @@ export async function getOrFetchItem(rawUrl: string, opts: LoadOptions = {}): Pr
 
   if (!opts.refresh) {
     const cached = await db.items.get(id)
-    if (cached) return { item: cached, fromCache: true }
+    // Un stub (étiquette issue d'un drop) est ré-fetché pour récupérer la
+    // vraie fiche (recette comprise).
+    if (cached && !cached.stub) return { item: cached, fromCache: true }
   }
 
   const queue = opts.queue ?? globalQueue

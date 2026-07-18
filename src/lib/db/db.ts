@@ -1,7 +1,9 @@
 import Dexie, { type EntityTable, type Table } from 'dexie'
 import type {
   CachedItem,
+  CachedMonster,
   Combat,
+  CombatCreature,
   CombatLoot,
   NodeState,
   PriceEntry,
@@ -17,6 +19,8 @@ export type AppDatabase = Dexie & {
   priceEntries: EntityTable<PriceEntry, 'id'>
   combats: EntityTable<Combat, 'id'>
   combatLoots: EntityTable<CombatLoot, 'id'>
+  monsters: EntityTable<CachedMonster, 'id'>
+  combatCreatures: EntityTable<CombatCreature, 'id'>
   meta: Table<{ key: string; value: unknown }, string>
 }
 
@@ -31,4 +35,10 @@ db.version(1).stores({
   combats: '++id, name',
   combatLoots: '++id, combatId, itemId',
   meta: 'key',
+})
+
+// v2 : import de monstres (drops) et créatures par combat.
+db.version(2).stores({
+  monsters: 'id, name',
+  combatCreatures: '++id, combatId, monsterId',
 })
