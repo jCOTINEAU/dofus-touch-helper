@@ -48,17 +48,30 @@ function parseHash(hash: string): Route {
 }
 
 const scrollKey = (hash: string) => hash.replace(/^#\/?/, '').replace(/\/$/, '') || '/'
+const SCROLL_STORE = 'dofus-craft:scroll'
+
+function loadScroll(): Map<string, number> {
+  try {
+    return new Map(Object.entries(JSON.parse(sessionStorage.getItem(SCROLL_STORE) ?? '{}')))
+  } catch {
+    return new Map()
+  }
+}
 
 function createRouter() {
   let current = $state<Route>(parseHash(location.hash))
-  // Position de scroll retenue par route, pour la restaurer au retour arrière.
-  const scrollPositions = new Map<string, number>()
+  // Position de scroll retenue par route (persistée le temps de la session
+  // de navigation), pour la restaurer au retour.
+  const scrollPositions = loadScroll()
+  const saveScroll = () =>
+    sessionStorage.setItem(SCROLL_STORE, JSON.stringify(Object.fromEntries(scrollPositions)))
 
   window.addEventListener('hashchange', (e) => {
     // Au moment du hashchange, la page sortante est encore rendue : on
     // enregistre sa position sous son ancien hash.
     const oldHash = e.oldURL.includes('#') ? '#' + e.oldURL.split('#')[1] : '#/'
     scrollPositions.set(scrollKey(oldHash), window.scrollY)
+    saveScroll()
     current = parseHash(location.hash)
   })
 

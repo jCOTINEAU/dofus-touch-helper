@@ -81,7 +81,14 @@
   )
   const targetList = $derived(targets.value.map((t) => ({ itemId: t.itemId, qty: t.qty })))
   const needs = $derived(computeNeeds(catalog, targetList, stateMap))
-  const tree = $derived(buildDisplayTree(catalog, targetList))
+  // Cibles complétées reléguées en fin de liste (désencombre la page).
+  const tree = $derived(
+    [...buildDisplayTree(catalog, targetList)].sort((a, b) => {
+      const da = needs.byItem.get(a.itemId)?.remaining === 0 ? 1 : 0
+      const db = needs.byItem.get(b.itemId)?.remaining === 0 ? 1 : 0
+      return da - db
+    }),
+  )
   const shopping = $derived.by(() => {
     const cost = costShopping(needs.shopping, priceOf)
     return needs.shopping
@@ -304,6 +311,7 @@
       {#each tree as node (node.itemId)}
         <CraftTreeNode
           {node}
+          projectId={pid}
           {items}
           needs={needs.byItem}
           {costOf}

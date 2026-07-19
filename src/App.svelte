@@ -15,6 +15,7 @@
   import DebugPage from './pages/DebugPage.svelte'
   import { swUpdate } from './lib/stores/swUpdate.svelte'
   import { lastProject } from './lib/stores/lastProject.svelte'
+  import { farmSession } from './lib/stores/farmSession.svelte'
 
   const route = $derived(router.route)
 
@@ -77,6 +78,15 @@
   <header class="navbar bg-base-100 pt-safe shadow-sm">
     <span class="text-lg font-bold px-2">Dofus Touch Craft</span>
   </header>
+
+  {#if farmSession.active && route.name !== 'farmSession'}
+    <a
+      href="#/combats/session"
+      class="flex items-center justify-center gap-2 bg-primary py-2 text-sm font-semibold text-primary-content"
+    >
+      ⏱ Session de farm en cours{farmSession.paused ? ' (en pause)' : ''} — Reprendre →
+    </a>
+  {/if}
 
   <main class="p-4 max-w-3xl mx-auto">
     {#if route.name === 'projets'}

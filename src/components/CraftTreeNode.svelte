@@ -8,10 +8,12 @@
   import type { CachedItem } from '../lib/types'
   import type { EffectiveCost } from '../lib/prices/costs'
   import { formatKamas } from '../lib/prices/format'
+  import { treeExpand } from '../lib/stores/treeExpand.svelte'
 
   interface Props {
     node: DisplayNode
     depth?: number
+    projectId: number
     items: Map<number, CachedItem>
     needs: Map<number, NodeNeed>
     /** Coût effectif crafter/acheter (optionnel — masqué si absent). */
@@ -23,6 +25,7 @@
   let {
     node,
     depth = 0,
+    projectId,
     items,
     needs,
     costOf,
@@ -42,11 +45,19 @@
   // Craftable mais basculé « à acheter » : recette ignorée.
   const buyMode = $derived(inPlan && craftable && need!.isLeafInPlan)
   const done = $derived(inPlan && need!.remaining === 0)
-  const canToggle = $derived(expanded && node.children.length > 0)
+  // Un nœud complété est forcé replié (et non dépliable) pour désencombrer.
+  const canToggle = $derived(expanded && node.children.length > 0 && !done)
+  // Replié par défaut ; l'état ouvert est mémorisé par projet. Complété = replié.
+  const open = $derived(!done && treeExpand.isOpen(projectId, node.itemId))
 
-  // Racine + premier niveau dépliés par défaut ; depth est stable sur la durée de vie du nœud.
-  // svelte-ignore state_referenced_locally
-  let open = $state(depth <= 1)
+  // Enfants triés : à faire d'abord, complétés en dernier (désencombre).
+  const sortedChildren = $derived(
+    [...node.children].sort((a, b) => {
+      const da = needs.get(a.itemId)?.remaining === 0 ? 1 : 0
+      const db = needs.get(b.itemId)?.remaining === 0 ? 1 : 0
+      return da - db
+    }),
+  )
 
   const cardClass = $derived.by(() => {
     if (!inPlan) return 'border-base-200 bg-base-100 opacity-55'
@@ -87,7 +98,7 @@
         <button
           type="button"
           class="flex min-h-12 min-w-0 flex-1 cursor-pointer touch-manipulation items-center gap-2 rounded-lg px-1 text-left transition-colors hover:bg-base-200/60 active:bg-base-200 sm:gap-3"
-          onclick={() => (open = !open)}
+          onclick={() => treeExpand.toggle(projectId, node.itemId)}
           aria-expanded={open}
           aria-label={open ? `Replier ${name}` : `Déplier ${name}`}
         >
@@ -231,10 +242,11 @@
 
   {#if canToggle && open}
     <div class="ml-3 border-l-2 border-base-300 pl-2 pt-0.5 sm:ml-5 sm:pl-3">
-      {#each node.children as child (child.itemId)}
+      {#each sortedChildren as child (child.itemId)}
         <CraftTreeNode
           node={child}
           depth={depth + 1}
+          {projectId}
           {items}
           {needs}
           {costOf}
