@@ -12,6 +12,8 @@
   import MonstersHidePage from './pages/MonstersHidePage.svelte'
   import SettingsPage from './pages/SettingsPage.svelte'
   import PriceSessionPage from './pages/PriceSessionPage.svelte'
+  import CraftMarginPage from './pages/CraftMarginPage.svelte'
+  import HdvOpportunitiesPage from './pages/HdvOpportunitiesPage.svelte'
   import DebugPage from './pages/DebugPage.svelte'
   import { swUpdate } from './lib/stores/swUpdate.svelte'
   import { lastProject } from './lib/stores/lastProject.svelte'
@@ -63,7 +65,12 @@
   const navItems = $derived([
     { hash: projetsHash, name: 'projets', label: 'Projets', match: ['projets', 'projet'] },
     { hash: '#/courses', name: 'courses', label: 'Courses', match: ['courses'] },
-    { hash: '#/prix', name: 'prix', label: 'Prix', match: ['prix', 'prixDetail', 'prixSession'] },
+    {
+      hash: '#/prix',
+      name: 'prix',
+      label: 'Prix',
+      match: ['prix', 'prixDetail', 'prixSession', 'craftMargin', 'hdvOpportunities'],
+    },
     {
       hash: '#/combats',
       name: 'combats',
@@ -101,6 +108,10 @@
       <PricesPage />
     {:else if route.name === 'prixSession'}
       <PriceSessionPage />
+    {:else if route.name === 'craftMargin'}
+      <CraftMarginPage />
+    {:else if route.name === 'hdvOpportunities'}
+      <HdvOpportunitiesPage />
     {:else if route.name === 'prixDetail'}
       {#key route.params.itemId}
         <PriceDetailPage itemId={route.params.itemId} />

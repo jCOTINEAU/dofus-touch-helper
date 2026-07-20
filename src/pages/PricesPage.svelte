@@ -153,9 +153,13 @@
 {/if}
 
 {#if tracked.length > 0 && search.trim().length < 2}
-  <a href="#/prix/session" class="btn btn-primary btn-lg mb-4 w-full">
+  <a href="#/prix/session" class="btn btn-primary btn-lg mb-3 w-full">
     ▶ Démarrer une session HDV ({tracked.length} suivies)
   </a>
+  <div class="mb-4 flex flex-wrap gap-2">
+    <a href="#/prix/rentabilite" class="btn btn-outline btn-sm flex-1">📊 Rentabilité craft</a>
+    <a href="#/prix/opportunites" class="btn btn-outline btn-sm flex-1">💹 Opportunités HDV</a>
+  </div>
 {/if}
 
 {#if search.trim().length >= 2}
