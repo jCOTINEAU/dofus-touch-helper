@@ -13,6 +13,7 @@
   import { isEncyclopediaItemUrl } from '../lib/fetch/url'
   import { globalMods } from '../lib/stores/globalMods.svelte'
   import ItemAvatar from '../components/ItemAvatar.svelte'
+  import NameSearch from '../components/NameSearch.svelte'
   import GlobalModsBar from '../components/GlobalModsBar.svelte'
   import QtyStepper from '../components/QtyStepper.svelte'
 
@@ -75,17 +76,17 @@
 
   // --- import d'une créature par URL ---
   let creatureUrl = $state('')
+  let creatureUrlMode = $state(false)
   let importing = $state(false)
   let importError = $state('')
   const creatureUrlValid = $derived(isEncyclopediaItemUrl(creatureUrl))
 
-  async function addCreature(e: SubmitEvent) {
-    e.preventDefault()
-    if (!creatureUrlValid || importing) return
+  async function addCreatureByUrl(url: string) {
+    if (importing) return
     importing = true
     importError = ''
     try {
-      const { monster } = await getOrFetchMonster(creatureUrl.trim())
+      const { monster } = await getOrFetchMonster(url.trim())
       const existing = await db.combatCreatures.where({ combatId: id, monsterId: monster.id }).first()
       if (existing) await db.combatCreatures.update(existing.id!, { count: existing.count + 1 })
       else await db.combatCreatures.add({ combatId: id, monsterId: monster.id, count: 1 })
@@ -95,6 +96,11 @@
     } finally {
       importing = false
     }
+  }
+
+  function addCreature(e: SubmitEvent) {
+    e.preventDefault()
+    if (creatureUrlValid) addCreatureByUrl(creatureUrl)
   }
 
   async function setCreatureCount(cid: number, count: number) {
@@ -168,18 +174,33 @@
 <div class="card bg-base-100 shadow-sm mb-4">
   <div class="card-body py-4">
     <h2 class="font-semibold">Créatures</h2>
-    <form class="flex flex-wrap gap-2" onsubmit={addCreature}>
-      <input
-        type="url"
-        class="input input-bordered flex-1 min-w-60"
-        placeholder="Coller l'URL encyclopédie d'un monstre…"
-        bind:value={creatureUrl}
-        disabled={importing}
+    {#if importing}
+      <div class="flex items-center gap-2 text-sm text-base-content/60">
+        <span class="loading loading-spinner loading-sm"></span> Import du monstre…
+      </div>
+    {:else if creatureUrlMode}
+      <form class="flex flex-wrap gap-2" onsubmit={addCreature}>
+        <input
+          type="url"
+          class="input input-bordered flex-1 min-w-60"
+          placeholder="Coller l'URL encyclopédie d'un monstre…"
+          bind:value={creatureUrl}
+        />
+        <button class="btn btn-primary" type="submit" disabled={!creatureUrlValid}>Importer</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick={() => (creatureUrlMode = false)}>
+          par nom
+        </button>
+      </form>
+    {:else}
+      <NameSearch
+        types={['monstres']}
+        placeholder="Chercher un monstre par nom…"
+        onSelect={(e) => addCreatureByUrl(e.url)}
       />
-      <button class="btn btn-primary" type="submit" disabled={!creatureUrlValid || importing}>
-        {#if importing}<span class="loading loading-spinner loading-sm"></span>{:else}Importer{/if}
+      <button type="button" class="btn btn-ghost btn-xs" onclick={() => (creatureUrlMode = true)}>
+        ou par URL
       </button>
-    </form>
+    {/if}
     {#if importError}<div class="alert alert-warning text-sm">{importError}</div>{/if}
 
     {#if creatures.value.length === 0}

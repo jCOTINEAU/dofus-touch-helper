@@ -6,6 +6,7 @@
   import { getOrFetchItem } from '../lib/fetch/itemLoader'
   import { isEncyclopediaItemUrl } from '../lib/fetch/url'
   import { router } from '../lib/router.svelte'
+  import NameSearch from '../components/NameSearch.svelte'
   import ItemAvatar from '../components/ItemAvatar.svelte'
   import EmptyState from '../components/EmptyState.svelte'
 
@@ -23,15 +24,15 @@
   let newUrl = $state('')
   let adding = $state(false)
   let addError = $state('')
+  let urlMode = $state(false)
   const addValid = $derived(isEncyclopediaItemUrl(newUrl))
 
-  async function addResource(e: SubmitEvent) {
-    e.preventDefault()
-    if (!addValid || adding) return
+  async function addByUrl(url: string) {
+    if (adding) return
     adding = true
     addError = ''
     try {
-      const { item } = await getOrFetchItem(newUrl.trim())
+      const { item } = await getOrFetchItem(url.trim())
       newUrl = ''
       router.go(`prix/${item.id}`)
     } catch (err) {
@@ -39,6 +40,11 @@
     } finally {
       adding = false
     }
+  }
+
+  function submitUrl(e: SubmitEvent) {
+    e.preventDefault()
+    if (addValid) addByUrl(newUrl)
   }
 
   // Section « Suivies » repliable, choix mémorisé (liste potentiellement longue).
@@ -131,26 +137,36 @@
   </label>
 </div>
 
-<form class="mb-4 flex flex-wrap gap-2" onsubmit={addResource}>
-  <input
-    type="url"
-    class="input input-bordered flex-1 min-w-60"
-    placeholder="Suivre une ressource : coller son URL encyclopédie…"
-    bind:value={newUrl}
-    disabled={adding}
-  />
-  <button class="btn btn-primary" type="submit" disabled={!addValid || adding}>
-    {#if adding}<span class="loading loading-spinner loading-sm"></span>{:else}Suivre{/if}
-  </button>
-</form>
-{#if newUrl !== '' && !addValid}
-  <p class="-mt-3 mb-4 text-xs text-error">
-    URL invalide — attendu : https://www.dofus-touch.com/fr/mmorpg/encyclopedie/…
-  </p>
-{/if}
-{#if addError}
-  <div class="alert alert-warning mb-4 text-sm">{addError}</div>
-{/if}
+<div class="mb-4">
+  {#if adding}
+    <div class="flex items-center gap-2 text-sm text-base-content/60">
+      <span class="loading loading-spinner loading-sm"></span> Import de la ressource…
+    </div>
+  {:else if urlMode}
+    <form class="flex flex-wrap gap-2" onsubmit={submitUrl}>
+      <input
+        type="url"
+        class="input input-bordered flex-1 min-w-60"
+        placeholder="Coller l'URL encyclopédie de la ressource…"
+        bind:value={newUrl}
+      />
+      <button class="btn btn-primary" type="submit" disabled={!addValid}>Suivre</button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick={() => (urlMode = false)}>
+        par nom
+      </button>
+    </form>
+  {:else}
+    <NameSearch
+      types={['ressources', 'equipements', 'armes', 'consommables']}
+      placeholder="Suivre une ressource : chercher par nom…"
+      onSelect={(e) => addByUrl(e.url)}
+    />
+    <button type="button" class="btn btn-ghost btn-xs mt-1" onclick={() => (urlMode = true)}>
+      ou par URL
+    </button>
+  {/if}
+  {#if addError}<div class="alert alert-warning mt-2 text-sm">{addError}</div>{/if}
+</div>
 
 {#if tracked.length > 0 && search.trim().length < 2}
   <a href="#/prix/session" class="btn btn-primary btn-lg mb-3 w-full">
