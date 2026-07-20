@@ -33,11 +33,11 @@ export async function getOrFetchMonster(
   }
 
   const queue = opts.queue ?? globalQueue
-  const markdown = await queue.enqueue(
-    (signal) => fetchViaJina(url, opts.fetchFn, signal),
-    opts.signal,
-  )
-  const parsed = parseMonsterPage(markdown, url)
+  // Parse dans la file (réponse vide réessayée).
+  const parsed = await queue.enqueue(async (signal) => {
+    const markdown = await fetchViaJina(url, opts.fetchFn, signal)
+    return parseMonsterPage(markdown, url)
+  }, opts.signal)
   const monster: CachedMonster = {
     id: parsed.id,
     url,

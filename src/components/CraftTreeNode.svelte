@@ -21,6 +21,7 @@
     onModeChange: (itemId: number, mode: 'craft' | 'buy') => void
     onOwnedChange: (itemId: number, owned: number) => void
     onCraft: (itemId: number) => void
+    onReimport: (itemId: number) => void
   }
   let {
     node,
@@ -32,6 +33,7 @@
     onModeChange,
     onOwnedChange,
     onCraft,
+    onReimport,
   }: Props = $props()
 
   const item = $derived(items.get(node.itemId))
@@ -242,6 +244,16 @@
               </button>
             {/if}
           </div>
+        {:else if need!.isLeafInPlan && item}
+          <!-- Feuille : ré-importer si la recette a été ratée à l'import
+               (ressource vue « de base » à tort, ou objet redevenu dispo). -->
+          <button
+            class="btn btn-ghost btn-sm h-11"
+            onclick={() => onReimport(node.itemId)}
+            title="Ré-importer depuis l'encyclopédie (rafraîchir la recette)"
+          >
+            ↻ ré-importer
+          </button>
         {/if}
       </div>
     {/if}
@@ -260,6 +272,7 @@
           {onModeChange}
           {onOwnedChange}
           {onCraft}
+          {onReimport}
         />
       {/each}
     </div>

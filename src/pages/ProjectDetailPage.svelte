@@ -6,6 +6,9 @@
   import { applyCraft } from '../lib/needs/craft'
   import { buildDisplayTree } from '../lib/needs/tree'
   import { expandCraftTree, type ExpandProgress } from '../lib/fetch/expand'
+  import { fetchPanoplie } from '../lib/fetch/panoplieLoader'
+  import { getOrFetchItem } from '../lib/fetch/itemLoader'
+  import { encyclopediaSection } from '../lib/fetch/url'
   import { recentMedianUnit } from '../lib/prices/stats'
   import { costShopping, effectiveCost, type EffectiveCost } from '../lib/prices/costs'
   import { formatKamas } from '../lib/prices/format'
@@ -143,28 +146,68 @@
   let expandWarnings = $state<string[]>([])
   let abort: AbortController | null = null
 
+  /** Ajoute un objet cible (une expansion) et le crée/incrémente. */
+  async function expandAndAddTarget(url: string, qty: number, signal: AbortSignal, prefix = '') {
+    const result = await expandCraftTree(url, {
+      signal,
+      onProgress: (p) => (progress = { ...p, currentName: `${prefix}${p.currentName ?? ''}` }),
+    })
+    expandWarnings = [...expandWarnings, ...result.warnings]
+    const existing = await db.projectTargets.where({ projectId: pid, itemId: result.rootId }).first()
+    if (existing) await db.projectTargets.update(existing.id!, { qty: existing.qty + qty })
+    else await db.projectTargets.add({ projectId: pid, itemId: result.rootId, qty })
+  }
+
   async function addTarget(url: string, qty: number) {
     expanding = true
     expandError = ''
+    expandWarnings = []
     progress = null
     abort = new AbortController()
     try {
-      const result = await expandCraftTree(url, {
-        signal: abort.signal,
-        onProgress: (p) => (progress = { ...p }),
-      })
-      expandWarnings = result.warnings
-      const existing = await db.projectTargets
-        .where({ projectId: pid, itemId: result.rootId })
-        .first()
-      if (existing) {
-        await db.projectTargets.update(existing.id!, { qty: existing.qty + qty })
+      if (encyclopediaSection(url) === 'panoplies') {
+        // Panoplie : importe chacun de ses équipements comme cible.
+        const panoplie = await fetchPanoplie(url, { signal: abort.signal })
+        if (panoplie.items.length === 0) {
+          expandError = 'Panoplie sans équipement détecté.'
+        }
+        for (let i = 0; i < panoplie.items.length; i++) {
+          const eq = panoplie.items[i]
+          await expandAndAddTarget(eq.url, qty, abort.signal, `${eq.name} (${i + 1}/${panoplie.items.length}) — `)
+        }
       } else {
-        await db.projectTargets.add({ projectId: pid, itemId: result.rootId, qty })
+        await expandAndAddTarget(url, qty, abort.signal)
       }
     } catch (e) {
       if (!(e instanceof DOMException && e.name === 'AbortError')) {
         expandError = `Récupération incomplète (${String(e)}). Les pages déjà chargées sont en cache : réessaie pour reprendre.`
+      }
+    } finally {
+      expanding = false
+      abort = null
+    }
+  }
+
+  /** Ré-importe un objet dont la recette a été ratée : rafraîchit sa page
+   * puis re-développe son sous-arbre (les enfants nouvellement découverts). */
+  async function reimport(itemId: number) {
+    const item = items.get(itemId)
+    if (!item) return
+    expanding = true
+    expandError = ''
+    expandWarnings = []
+    progress = null
+    abort = new AbortController()
+    try {
+      await getOrFetchItem(item.url, { refresh: true, signal: abort.signal })
+      const result = await expandCraftTree(item.url, {
+        signal: abort.signal,
+        onProgress: (p) => (progress = { ...p }),
+      })
+      expandWarnings = result.warnings
+    } catch (e) {
+      if (!(e instanceof DOMException && e.name === 'AbortError')) {
+        expandError = `Ré-import incomplet (${String(e)}).`
       }
     } finally {
       expanding = false
@@ -318,6 +361,7 @@
           onModeChange={(id, mode) => setNodeMode(pid, id, mode)}
           onOwnedChange={(id, owned) => setNodeOwned(pid, id, owned)}
           onCraft={(id) => craft(id)}
+          onReimport={(id) => reimport(id)}
         />
       {/each}
     </div>

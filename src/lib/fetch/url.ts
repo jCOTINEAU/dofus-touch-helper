@@ -17,3 +17,9 @@ export function normalizeItemUrl(raw: string): string {
 export function isEncyclopediaItemUrl(url: string): boolean {
   return ENCYCLOPEDIA_RE.test(normalizeItemUrl(url))
 }
+
+/** Section de l'encyclopédie ("panoplies", "monstres", "equipements"…) ou null. */
+export function encyclopediaSection(url: string): string | null {
+  const m = /\/encyclopedie\/([a-z-]+)\/\d+/.exec(normalizeItemUrl(url))
+  return m ? m[1] : null
+}

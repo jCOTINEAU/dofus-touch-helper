@@ -85,4 +85,18 @@ describe('getOrFetchItem', () => {
       /URL encyclopédie invalide/,
     )
   })
+
+  it('réponse jina vide : réessayée puis succès (pas d’échec d’expansion)', async () => {
+    let n = 0
+    const fetchFn = (async (input: RequestInfo | URL) => {
+      n++
+      // 1re réponse vide (jina transitoire) → EmptyPageError → retry ;
+      // 2e réponse valide.
+      const body = n === 1 ? '' : itemPage('Ressource B', URL_B)
+      return new Response(body, { status: 200 })
+    }) as typeof fetch
+    const { item } = await getOrFetchItem(URL_B, { queue: instantQueue(), fetchFn })
+    expect(n).toBe(2)
+    expect(item).toMatchObject({ id: 2, name: 'Ressource B', fetchStatus: 'ok' })
+  })
 })

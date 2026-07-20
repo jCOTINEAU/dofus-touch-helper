@@ -22,7 +22,7 @@
   <input
     type="url"
     class="input input-bordered flex-1 min-w-60"
-    placeholder="Coller l'URL encyclopédie de l'objet…"
+    placeholder="Coller l'URL d'un objet ou d'une panoplie…"
     bind:value={url}
     {disabled}
   />

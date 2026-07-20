@@ -41,11 +41,12 @@ export async function getOrFetchItem(rawUrl: string, opts: LoadOptions = {}): Pr
   const queue = opts.queue ?? globalQueue
   let item: CachedItem
   try {
-    const markdown = await queue.enqueue(
-      (signal) => fetchViaJina(url, opts.fetchFn, signal),
-      opts.signal,
-    )
-    const parsed = parseItemPage(markdown, url)
+    // Parse DANS la file : une réponse jina vide (EmptyPageError) est alors
+    // réessayée avec backoff au lieu de faire échouer l'appel.
+    const parsed = await queue.enqueue(async (signal) => {
+      const markdown = await fetchViaJina(url, opts.fetchFn, signal)
+      return parseItemPage(markdown, url)
+    }, opts.signal)
     item = {
       id: parsed.id,
       url,
