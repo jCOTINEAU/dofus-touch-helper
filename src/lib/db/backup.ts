@@ -41,6 +41,13 @@ export async function importBackup(data: unknown): Promise<{ counts: Record<stri
   if (backup?.app !== 'dofus-touch-helper' || backup.version !== 1 || !backup.tables) {
     throw new Error('Fichier de sauvegarde invalide (app/version)')
   }
+  // Chaque table présente doit être un tableau (sinon fichier corrompu).
+  for (const name of TABLES) {
+    const rows = backup.tables[name]
+    if (rows !== undefined && !Array.isArray(rows)) {
+      throw new Error(`Sauvegarde invalide : la table « ${name} » n'est pas une liste`)
+    }
+  }
   const counts: Record<string, number> = {}
   await db.transaction(
     'rw',
@@ -49,7 +56,9 @@ export async function importBackup(data: unknown): Promise<{ counts: Record<stri
       for (const name of TABLES) {
         const rows = backup.tables[name] ?? []
         await db.table(name).clear()
-        await db.table(name).bulkAdd(rows)
+        // bulkPut : tolère d'éventuels doublons de clé (dernier gagne)
+        // plutôt que de faire échouer tout l'import.
+        await db.table(name).bulkPut(rows)
         counts[name] = rows.length
       }
     },

@@ -93,7 +93,9 @@ export function parseItemPage(markdown: string, sourceUrl: string): ParsedItem {
   const category = titleParts.length > 1 ? titleParts[1].trim() : null
 
   // --- Corps : niveau et image de l'objet (avant la section Recette) ---
-  const recipeStart = body.findIndex((l) => l === 'Recette')
+  // Ancré mais tolérant aux variantes de rendu (« ## Recette », « Recette : »).
+  const RECIPE_HEADING = /^#{0,6}\s*Recette\s*:?\s*$/
+  const recipeStart = body.findIndex((l) => RECIPE_HEADING.test(l))
   const beforeRecipe = recipeStart === -1 ? body : body.slice(0, recipeStart)
 
   let level: number | null = null

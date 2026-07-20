@@ -60,7 +60,8 @@ export function parseMonsterPage(markdown: string, sourceUrl: string): ParsedMon
   const family = raceMatch ? raceMatch[1].trim() : null
   const famIdMatch = /monster_category(?:\[\])?=(\d+)/.exec(markdown)
   const familyId = famIdMatch ? Number(famIdMatch[1]) : null
-  const lvlMatch = /Niveau\s*:\s*(\d+)(?:\s*à\s*(\d+))?/.exec(markdown)
+  // Tranche de niveau : « 51 à 55 », « 51-55 », « 51–55 » ou niveau simple.
+  const lvlMatch = /Niveau\s*:\s*(\d+)(?:\s*(?:à|-|–)\s*(\d+))?/.exec(markdown)
   const levelMin = lvlMatch ? Number(lvlMatch[1]) : null
   const levelMax = lvlMatch ? Number(lvlMatch[2] ?? lvlMatch[1]) : null
 

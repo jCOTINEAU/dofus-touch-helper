@@ -10,6 +10,7 @@
 
 import { db } from '../db/db'
 import type { CreatureCount } from '../types'
+import { capSec, elapsedSec as pureElapsed } from '../combats/sessionTiming'
 
 export type Phase = 'idle' | 'preparing' | 'fighting'
 
@@ -48,8 +49,7 @@ let state = $state<LiveState | null>(load())
 
 /** Secondes écoulées sur la phase chronométrée en cours (idle/fighting). */
 function elapsedSec(s: LiveState, now: number): number {
-  const ref = s.pausedAt ?? now
-  return Math.max(0, Math.round((ref - s.phaseStartedAt - s.pausedAccumMs) / 1000))
+  return pureElapsed(s.phaseStartedAt, s.pausedAt, s.pausedAccumMs, now)
 }
 
 export const farmSession = {
@@ -84,7 +84,7 @@ export const farmSession = {
   /** idle → preparing : fige le temps d'exploration, ouvre la sélection. */
   prepare() {
     if (!state || state.phase !== 'idle') return
-    state.pendingIdleSec = elapsedSec(state, Date.now())
+    state.pendingIdleSec = capSec(elapsedSec(state, Date.now()))
     state.phase = 'preparing'
     state.prep = []
     state.pausedAt = null
@@ -124,7 +124,7 @@ export const farmSession = {
   /** fighting → idle : enregistre le combat mesuré, relance l'exploration. */
   async endFight() {
     if (!state || state.phase !== 'fighting') return
-    const durationSec = elapsedSec(state, Date.now())
+    const durationSec = capSec(elapsedSec(state, Date.now()))
     await db.sessionCombats.add({
       sessionId: state.sessionId,
       durationSec,
@@ -142,7 +142,8 @@ export const farmSession = {
   },
 
   togglePause() {
-    if (!state) return
+    // Pas de chrono en préparation : la pause n'y a pas de sens.
+    if (!state || state.phase === 'preparing') return
     if (state.pausedAt == null) {
       state.pausedAt = Date.now()
     } else {

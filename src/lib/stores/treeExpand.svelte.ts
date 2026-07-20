@@ -31,4 +31,10 @@ export const treeExpand = {
     data = { ...data, [projectId]: [...set] }
     save()
   },
+  collapse(projectId: number, itemId: number) {
+    const list = data[projectId] ?? []
+    if (!list.includes(itemId)) return
+    data = { ...data, [projectId]: list.filter((x) => x !== itemId) }
+    save()
+  },
 }

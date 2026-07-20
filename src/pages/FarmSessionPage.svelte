@@ -75,7 +75,7 @@
 <div class="flex items-center gap-2 mb-3">
   <a href="#/combats" class="btn btn-ghost btn-square text-xl" aria-label="Retour">←</a>
   <h1 class="text-2xl font-bold flex-1">Session de farm</h1>
-  {#if farmSession.active}
+  {#if farmSession.active && live?.phase !== 'preparing'}
     <button class="btn btn-sm" onclick={() => farmSession.togglePause()}>
       {farmSession.paused ? '▶ Reprendre' : '⏸ Pause'}
     </button>

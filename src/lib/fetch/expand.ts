@@ -81,6 +81,9 @@ export async function expandCraftTree(
     }
     done++
     rootId ??= item.id
+    // L'id parsé peut différer de celui de l'URL (redirection/slug obsolète) :
+    // on le marque vu pour éviter un cycle auto-référent.
+    seen.add(item.id)
 
     if (item.fetchStatus === 'dead') {
       warnings.push(`« ${item.name} » n'existe plus dans l'encyclopédie (compté tel quel)`)

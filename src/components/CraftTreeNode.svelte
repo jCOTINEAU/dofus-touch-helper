@@ -45,10 +45,17 @@
   // Craftable mais basculé « à acheter » : recette ignorée.
   const buyMode = $derived(inPlan && craftable && need!.isLeafInPlan)
   const done = $derived(inPlan && need!.remaining === 0)
-  // Un nœud complété est forcé replié (et non dépliable) pour désencombrer.
-  const canToggle = $derived(expanded && node.children.length > 0 && !done)
-  // Replié par défaut ; l'état ouvert est mémorisé par projet. Complété = replié.
-  const open = $derived(!done && treeExpand.isOpen(projectId, node.itemId))
+  const canToggle = $derived(expanded && node.children.length > 0)
+  // Replié par défaut ; l'état ouvert est mémorisé par projet.
+  const open = $derived(treeExpand.isOpen(projectId, node.itemId))
+
+  // Repli automatique À LA TRANSITION vers « complété » (désencombre), tout
+  // en laissant le nœud ré-ouvrable manuellement ensuite.
+  let prevDone = false
+  $effect(() => {
+    if (done && !prevDone) treeExpand.collapse(projectId, node.itemId)
+    prevDone = done
+  })
 
   // Enfants triés : à faire d'abord, complétés en dernier (désencombre).
   const sortedChildren = $derived(
