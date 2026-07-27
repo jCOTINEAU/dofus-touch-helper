@@ -19,6 +19,7 @@ const TABLES = [
   'sessionCombats',
   'statProfiles',
   'spellChoices',
+  'scenarios',
   'meta',
 ] as const
 

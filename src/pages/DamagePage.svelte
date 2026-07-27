@@ -1,9 +1,10 @@
 <script lang="ts">
   import StatProfilesPage from './StatProfilesPage.svelte'
   import SpellsPage from './SpellsPage.svelte'
+  import CalcPage from './CalcPage.svelte'
 
-  // Section « Dégâts » : onglets Profils | Sorts (le calcul viendra ensuite).
-  let tab = $state<'profils' | 'sorts'>('profils')
+  // Section « Dégâts » : onglets Profils | Sorts | Calcul.
+  let tab = $state<'profils' | 'sorts' | 'calcul'>('profils')
 </script>
 
 <div role="tablist" class="tabs tabs-box mb-4">
@@ -21,10 +22,19 @@
   >
     Sorts
   </button>
+  <button
+    role="tab"
+    class="tab {tab === 'calcul' ? 'tab-active' : ''}"
+    onclick={() => (tab = 'calcul')}
+  >
+    Calcul
+  </button>
 </div>
 
 {#if tab === 'profils'}
   <StatProfilesPage />
-{:else}
+{:else if tab === 'sorts'}
   <SpellsPage />
+{:else}
+  <CalcPage />
 {/if}

@@ -104,6 +104,9 @@ function parseLevel(html, level) {
     levelRequired: Number(grab(html, /ak-spell-required-lvl">Niveau requis\s*(\d+)/) ?? '0') || null,
     critPct: num(/Probabilité de coup critique[^0-9]*(\d+)\s*%/),
     usesPerTurn: num(/Utilisations par tour[^0-9]*(\d+)/),
+    // Limite propre au lanceur (souvent < utilisations/tour) : c'est elle qui
+    // borne le mono-cible.
+    castsPerTurn: num(/Nb\.?\s*de lancers par tour par joueur[^0-9]*(\d+)/),
     cooldown: num(/Intervalle de relance[^0-9]*(\d+)/),
     normal,
     critical,

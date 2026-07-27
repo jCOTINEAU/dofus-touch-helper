@@ -14,6 +14,8 @@ export interface SpellLevel {
   levelRequired: number | null
   critPct: number | null
   usesPerTurn: number | null
+  /** Lancers/tour propres au joueur (borne le mono-cible ; souvent < usesPerTurn). */
+  castsPerTurn: number | null
   cooldown: number | null
   /** Textes bruts des effets, ex. « 30 Dommages (2 tours) ». */
   normal: string[]

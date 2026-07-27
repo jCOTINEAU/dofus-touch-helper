@@ -16,6 +16,7 @@
           "levelRequired": 1,
           "critPct": 15,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "15% Érosion (2 tours)",
@@ -36,6 +37,7 @@
           "levelRequired": 1,
           "critPct": 15,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "15% Érosion (2 tours)",
@@ -56,6 +58,7 @@
           "levelRequired": 1,
           "critPct": 15,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "15% Érosion (2 tours)",
@@ -76,6 +79,7 @@
           "levelRequired": 1,
           "critPct": 15,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "15% Érosion (2 tours)",
@@ -96,6 +100,7 @@
           "levelRequired": 51,
           "critPct": 15,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "15% Érosion (2 tours)",
@@ -116,6 +121,7 @@
           "levelRequired": 101,
           "critPct": 15,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "15% Érosion (2 tours)",
@@ -144,6 +150,7 @@
           "levelRequired": 7,
           "critPct": 15,
           "usesPerTurn": 1,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "12 à 14 (meilleur élément)",
@@ -162,6 +169,7 @@
           "levelRequired": 7,
           "critPct": 15,
           "usesPerTurn": 1,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "13 à 15 (meilleur élément)",
@@ -180,6 +188,7 @@
           "levelRequired": 7,
           "critPct": 15,
           "usesPerTurn": 1,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "15 à 17 (meilleur élément)",
@@ -198,6 +207,7 @@
           "levelRequired": 7,
           "critPct": 15,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "17 à 19 (meilleur élément)",
@@ -216,6 +226,7 @@
           "levelRequired": 57,
           "critPct": 15,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "19 à 21 (meilleur élément)",
@@ -234,6 +245,7 @@
           "levelRequired": 107,
           "critPct": 15,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "22 à 24 (meilleur élément)",
@@ -260,6 +272,7 @@
           "levelRequired": 13,
           "critPct": 15,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 8,
           "normal": [
             "30 Puissance (3 tours)",
@@ -280,6 +293,7 @@
           "levelRequired": 13,
           "critPct": 15,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 7,
           "normal": [
             "40 Puissance (3 tours)",
@@ -300,6 +314,7 @@
           "levelRequired": 13,
           "critPct": 15,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 6,
           "normal": [
             "50 Puissance (3 tours)",
@@ -320,6 +335,7 @@
           "levelRequired": 13,
           "critPct": 15,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 5,
           "normal": [
             "70 Puissance (3 tours)",
@@ -340,6 +356,7 @@
           "levelRequired": 63,
           "critPct": 15,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 4,
           "normal": [
             "250 Puissance (3 tours)",
@@ -360,6 +377,7 @@
           "levelRequired": 113,
           "critPct": 15,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 4,
           "normal": [
             "350 Puissance (3 tours)",
@@ -388,6 +406,7 @@
           "levelRequired": 31,
           "critPct": 5,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "12 à 16 (dommages Terre)",
@@ -410,6 +429,7 @@
           "levelRequired": 31,
           "critPct": 5,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "13 à 17 (dommages Terre)",
@@ -432,6 +452,7 @@
           "levelRequired": 31,
           "critPct": 5,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "14 à 18 (dommages Terre)",
@@ -454,6 +475,7 @@
           "levelRequired": 31,
           "critPct": 5,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "15 à 19 (dommages Terre)",
@@ -476,6 +498,7 @@
           "levelRequired": 81,
           "critPct": 5,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "16 à 20 (dommages Terre)",
@@ -498,6 +521,7 @@
           "levelRequired": 131,
           "critPct": 5,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "20 à 24 (dommages Terre)",
@@ -528,6 +552,7 @@
           "levelRequired": 37,
           "critPct": 5,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 7,
           "normal": [
             "État 'Vitalité' (2 tours)",
@@ -548,6 +573,7 @@
           "levelRequired": 37,
           "critPct": 5,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 6,
           "normal": [
             "État 'Vitalité' (2 tours)",
@@ -568,6 +594,7 @@
           "levelRequired": 37,
           "critPct": 5,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 5,
           "normal": [
             "État 'Vitalité' (2 tours)",
@@ -588,6 +615,7 @@
           "levelRequired": 37,
           "critPct": 5,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 4,
           "normal": [
             "État 'Vitalité' (2 tours)",
@@ -608,6 +636,7 @@
           "levelRequired": 87,
           "critPct": 5,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 3,
           "normal": [
             "État 'Vitalité' (2 tours)",
@@ -628,6 +657,7 @@
           "levelRequired": 137,
           "critPct": 5,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 3,
           "normal": [
             "État 'Vitalité' (2 tours)",
@@ -656,6 +686,7 @@
           "levelRequired": 43,
           "critPct": 5,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "3 à 4 (meilleur élément)",
@@ -674,6 +705,7 @@
           "levelRequired": 43,
           "critPct": 5,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "4 à 5 (meilleur élément)",
@@ -692,6 +724,7 @@
           "levelRequired": 43,
           "critPct": 5,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "5 à 6 (meilleur élément)",
@@ -710,6 +743,7 @@
           "levelRequired": 43,
           "critPct": 5,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "6 à 7 (meilleur élément)",
@@ -728,6 +762,7 @@
           "levelRequired": 93,
           "critPct": 5,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "7 à 8 (meilleur élément)",
@@ -746,6 +781,7 @@
           "levelRequired": 143,
           "critPct": 5,
           "usesPerTurn": 3,
+          "castsPerTurn": 2,
           "cooldown": null,
           "normal": [
             "10 à 12 (meilleur élément)",
@@ -772,6 +808,7 @@
           "levelRequired": 67,
           "critPct": 20,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "24 à 28 (dommages Terre)"
@@ -788,6 +825,7 @@
           "levelRequired": 67,
           "critPct": 20,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "25 à 29 (dommages Terre)"
@@ -804,6 +842,7 @@
           "levelRequired": 67,
           "critPct": 20,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "26 à 30 (dommages Terre)"
@@ -820,6 +859,7 @@
           "levelRequired": 67,
           "critPct": 20,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "27 à 31 (dommages Terre)"
@@ -836,6 +876,7 @@
           "levelRequired": 117,
           "critPct": 20,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "31 à 35 (dommages Terre)"
@@ -852,6 +893,7 @@
           "levelRequired": 167,
           "critPct": 20,
           "usesPerTurn": 2,
+          "castsPerTurn": null,
           "cooldown": null,
           "normal": [
             "35 à 39 (dommages Terre)"
@@ -876,6 +918,7 @@
           "levelRequired": 73,
           "critPct": null,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 10,
           "normal": [
             "Maximise les effets aléatoires (2 tours)",
@@ -891,6 +934,7 @@
           "levelRequired": 73,
           "critPct": null,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 9,
           "normal": [
             "Maximise les effets aléatoires (2 tours)",
@@ -906,6 +950,7 @@
           "levelRequired": 73,
           "critPct": null,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 8,
           "normal": [
             "Maximise les effets aléatoires (2 tours)",
@@ -921,6 +966,7 @@
           "levelRequired": 73,
           "critPct": null,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 7,
           "normal": [
             "Maximise les effets aléatoires (2 tours)",
@@ -936,6 +982,7 @@
           "levelRequired": 123,
           "critPct": null,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 6,
           "normal": [
             "Maximise les effets aléatoires (2 tours)",
@@ -951,6 +998,7 @@
           "levelRequired": 173,
           "critPct": null,
           "usesPerTurn": null,
+          "castsPerTurn": null,
           "cooldown": 5,
           "normal": [
             "Maximise les effets aléatoires (2 tours)",

@@ -14,6 +14,7 @@ import type {
 } from '../types'
 import type { StatProfile } from '../damage/stats'
 import type { SpellChoice } from '../damage/spells'
+import type { Scenario } from '../damage/calc'
 
 export type AppDatabase = Dexie & {
   items: EntityTable<CachedItem, 'id'>
@@ -29,6 +30,7 @@ export type AppDatabase = Dexie & {
   sessionCombats: EntityTable<SessionCombat, 'id'>
   statProfiles: EntityTable<StatProfile, 'id'>
   spellChoices: EntityTable<SpellChoice, 'id'>
+  scenarios: EntityTable<Scenario, 'id'>
   meta: Table<{ key: string; value: unknown }, string>
 }
 
@@ -65,4 +67,9 @@ db.version(4).stores({
 // v5 : kit de sorts retenus (feature Dégâts).
 db.version(5).stores({
   spellChoices: '++id, spellId, [class+spellId]',
+})
+
+// v6 : scénarios d'enchaînement (calculateur de dégâts).
+db.version(6).stores({
+  scenarios: '++id, name',
 })
