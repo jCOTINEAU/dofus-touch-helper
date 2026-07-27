@@ -17,6 +17,8 @@ const TABLES = [
   'combatCreatures',
   'farmSessions',
   'sessionCombats',
+  'statProfiles',
+  'spellChoices',
   'meta',
 ] as const
 

@@ -12,6 +12,8 @@ import type {
   ProjectTarget,
   SessionCombat,
 } from '../types'
+import type { StatProfile } from '../damage/stats'
+import type { SpellChoice } from '../damage/spells'
 
 export type AppDatabase = Dexie & {
   items: EntityTable<CachedItem, 'id'>
@@ -25,6 +27,8 @@ export type AppDatabase = Dexie & {
   combatCreatures: EntityTable<CombatCreature, 'id'>
   farmSessions: EntityTable<FarmSession, 'id'>
   sessionCombats: EntityTable<SessionCombat, 'id'>
+  statProfiles: EntityTable<StatProfile, 'id'>
+  spellChoices: EntityTable<SpellChoice, 'id'>
   meta: Table<{ key: string; value: unknown }, string>
 }
 
@@ -51,4 +55,14 @@ db.version(2).stores({
 db.version(3).stores({
   farmSessions: '++id, startedAt',
   sessionCombats: '++id, sessionId',
+})
+
+// v4 : profils de stats (feature Dégâts).
+db.version(4).stores({
+  statProfiles: '++id, name',
+})
+
+// v5 : kit de sorts retenus (feature Dégâts).
+db.version(5).stores({
+  spellChoices: '++id, spellId, [class+spellId]',
 })

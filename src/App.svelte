@@ -14,6 +14,7 @@
   import PriceSessionPage from './pages/PriceSessionPage.svelte'
   import CraftMarginPage from './pages/CraftMarginPage.svelte'
   import HdvOpportunitiesPage from './pages/HdvOpportunitiesPage.svelte'
+  import DamagePage from './pages/DamagePage.svelte'
   import DebugPage from './pages/DebugPage.svelte'
   import { swUpdate } from './lib/stores/swUpdate.svelte'
   import { lastProject } from './lib/stores/lastProject.svelte'
@@ -77,6 +78,7 @@
       label: 'Combats',
       match: ['combats', 'combatDetail', 'farmSession', 'farmHistory', 'monstersHide'],
     },
+    { hash: '#/degats', name: 'degats', label: 'Dégâts', match: ['degats'] },
     { hash: '#/reglages', name: 'reglages', label: 'Réglages', match: ['reglages'] },
   ])
 </script>
@@ -128,6 +130,8 @@
       {#key route.params.id}
         <CombatDetailPage combatId={route.params.id} />
       {/key}
+    {:else if route.name === 'degats'}
+      <DamagePage />
     {:else if route.name === 'reglages'}
       <SettingsPage />
     {:else if route.name === 'debug'}

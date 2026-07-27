@@ -1,0 +1,964 @@
+{
+  "version": 1,
+  "class": "iop",
+  "spells": [
+    {
+      "id": 8139,
+      "name": "Pression",
+      "description": "Occasionne des dommages Terre et applique un malus d'Érosion. Plus la cible est proche du lanceur, plus les dommages occasionnés sont importants. Lorsque le lanceur est dans l'état Vitalité posé par le sort Vitalité, les dommages du sort deviennent du vol de vie. Le cumul d'érosion est partagé avec le sort Epée Destructrice.",
+      "maxLevel": 6,
+      "levels": [
+        {
+          "level": 1,
+          "poMin": 1,
+          "poMax": 3,
+          "pa": 3,
+          "levelRequired": 1,
+          "critPct": 15,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "15% Érosion (2 tours)",
+            "23 à 26 (dommages Terre)",
+            "23 à 26 (vol Terre)"
+          ],
+          "critical": [
+            "15% Érosion (2 tours)",
+            "26 à 29 (dommages Terre)",
+            "26 à 29 (vol Terre)"
+          ]
+        },
+        {
+          "level": 2,
+          "poMin": 1,
+          "poMax": 3,
+          "pa": 3,
+          "levelRequired": 1,
+          "critPct": 15,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "15% Érosion (2 tours)",
+            "25 à 28 (dommages Terre)",
+            "25 à 28 (vol Terre)"
+          ],
+          "critical": [
+            "15% Érosion (2 tours)",
+            "27 à 30 (dommages Terre)",
+            "27 à 30 (vol Terre)"
+          ]
+        },
+        {
+          "level": 3,
+          "poMin": 1,
+          "poMax": 3,
+          "pa": 3,
+          "levelRequired": 1,
+          "critPct": 15,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "15% Érosion (2 tours)",
+            "26 à 29 (dommages Terre)",
+            "26 à 29 (vol Terre)"
+          ],
+          "critical": [
+            "15% Érosion (2 tours)",
+            "28 à 31 (dommages Terre)",
+            "28 à 31 (vol Terre)"
+          ]
+        },
+        {
+          "level": 4,
+          "poMin": 1,
+          "poMax": 3,
+          "pa": 3,
+          "levelRequired": 1,
+          "critPct": 15,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "15% Érosion (2 tours)",
+            "27 à 30 (dommages Terre)",
+            "27 à 30 (vol Terre)"
+          ],
+          "critical": [
+            "15% Érosion (2 tours)",
+            "29 à 32 (dommages Terre)",
+            "29 à 32 (vol Terre)"
+          ]
+        },
+        {
+          "level": 5,
+          "poMin": 1,
+          "poMax": 4,
+          "pa": 3,
+          "levelRequired": 51,
+          "critPct": 15,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "15% Érosion (2 tours)",
+            "30 à 33 (dommages Terre)",
+            "30 à 33 (vol Terre)"
+          ],
+          "critical": [
+            "15% Érosion (2 tours)",
+            "34 à 37 (dommages Terre)",
+            "34 à 37 (vol Terre)"
+          ]
+        },
+        {
+          "level": 6,
+          "poMin": 1,
+          "poMax": 4,
+          "pa": 3,
+          "levelRequired": 101,
+          "critPct": 15,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "15% Érosion (2 tours)",
+            "34 à 37 (dommages Terre)",
+            "34 à 37 (vol Terre)"
+          ],
+          "critical": [
+            "15% Érosion (2 tours)",
+            "37 à 40 (dommages Terre)",
+            "37 à 40 (vol Terre)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8131,
+      "name": "Epée Divine",
+      "description": "Occasionne des dommages en croix dans le meilleur élément et donne des dommages aux alliés dans la zone. L'augmentation des dommages n'est pas cumulable.",
+      "maxLevel": 6,
+      "levels": [
+        {
+          "level": 1,
+          "poMin": 1,
+          "poMax": 1,
+          "pa": 3,
+          "levelRequired": 7,
+          "critPct": 15,
+          "usesPerTurn": 1,
+          "cooldown": null,
+          "normal": [
+            "12 à 14 (meilleur élément)",
+            "15 Dommages (2 tours)"
+          ],
+          "critical": [
+            "15 (meilleur élément)",
+            "18 Dommages (2 tours)"
+          ]
+        },
+        {
+          "level": 2,
+          "poMin": 1,
+          "poMax": 1,
+          "pa": 3,
+          "levelRequired": 7,
+          "critPct": 15,
+          "usesPerTurn": 1,
+          "cooldown": null,
+          "normal": [
+            "13 à 15 (meilleur élément)",
+            "18 Dommages (2 tours)"
+          ],
+          "critical": [
+            "17 (meilleur élément)",
+            "21 Dommages (2 tours)"
+          ]
+        },
+        {
+          "level": 3,
+          "poMin": 2,
+          "poMax": 2,
+          "pa": 3,
+          "levelRequired": 7,
+          "critPct": 15,
+          "usesPerTurn": 1,
+          "cooldown": null,
+          "normal": [
+            "15 à 17 (meilleur élément)",
+            "21 Dommages (2 tours)"
+          ],
+          "critical": [
+            "19 (meilleur élément)",
+            "24 Dommages (2 tours)"
+          ]
+        },
+        {
+          "level": 4,
+          "poMin": 2,
+          "poMax": 2,
+          "pa": 3,
+          "levelRequired": 7,
+          "critPct": 15,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "17 à 19 (meilleur élément)",
+            "24 Dommages (2 tours)"
+          ],
+          "critical": [
+            "22 (meilleur élément)",
+            "27 Dommages (2 tours)"
+          ]
+        },
+        {
+          "level": 5,
+          "poMin": 2,
+          "poMax": 2,
+          "pa": 3,
+          "levelRequired": 57,
+          "critPct": 15,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "19 à 21 (meilleur élément)",
+            "27 Dommages (2 tours)"
+          ],
+          "critical": [
+            "24 (meilleur élément)",
+            "30 Dommages (2 tours)"
+          ]
+        },
+        {
+          "level": 6,
+          "poMin": 3,
+          "poMax": 3,
+          "pa": 3,
+          "levelRequired": 107,
+          "critPct": 15,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "22 à 24 (meilleur élément)",
+            "30 Dommages (2 tours)"
+          ],
+          "critical": [
+            "27 (meilleur élément)",
+            "35 Dommages (2 tours)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8137,
+      "name": "Puissance",
+      "description": "Augmente la Puissance de la cible. Si un allié est ciblé, le lanceur gagne également un montant de Puissance un peu plus minime. Ne fonctionne pas sur les autres iops.",
+      "maxLevel": 6,
+      "levels": [
+        {
+          "level": 1,
+          "poMin": 1,
+          "poMax": 1,
+          "pa": 3,
+          "levelRequired": 13,
+          "critPct": 15,
+          "usesPerTurn": null,
+          "cooldown": 8,
+          "normal": [
+            "30 Puissance (3 tours)",
+            "30 Puissance (3 tours)",
+            "15 Puissance (3 tours)"
+          ],
+          "critical": [
+            "40 Puissance (3 tours)",
+            "40 Puissance (3 tours)",
+            "20 Puissance (3 tours)"
+          ]
+        },
+        {
+          "level": 2,
+          "poMin": 2,
+          "poMax": 2,
+          "pa": 3,
+          "levelRequired": 13,
+          "critPct": 15,
+          "usesPerTurn": null,
+          "cooldown": 7,
+          "normal": [
+            "40 Puissance (3 tours)",
+            "40 Puissance (3 tours)",
+            "20 Puissance (3 tours)"
+          ],
+          "critical": [
+            "50 Puissance (3 tours)",
+            "50 Puissance (3 tours)",
+            "25 Puissance (3 tours)"
+          ]
+        },
+        {
+          "level": 3,
+          "poMin": 3,
+          "poMax": 3,
+          "pa": 3,
+          "levelRequired": 13,
+          "critPct": 15,
+          "usesPerTurn": null,
+          "cooldown": 6,
+          "normal": [
+            "50 Puissance (3 tours)",
+            "50 Puissance (3 tours)",
+            "25 Puissance (3 tours)"
+          ],
+          "critical": [
+            "60 Puissance (3 tours)",
+            "60 Puissance (3 tours)",
+            "30 Puissance (3 tours)"
+          ]
+        },
+        {
+          "level": 4,
+          "poMin": 4,
+          "poMax": 4,
+          "pa": 3,
+          "levelRequired": 13,
+          "critPct": 15,
+          "usesPerTurn": null,
+          "cooldown": 5,
+          "normal": [
+            "70 Puissance (3 tours)",
+            "70 Puissance (3 tours)",
+            "35 Puissance (3 tours)"
+          ],
+          "critical": [
+            "80 Puissance (3 tours)",
+            "80 Puissance (3 tours)",
+            "40 Puissance (3 tours)"
+          ]
+        },
+        {
+          "level": 5,
+          "poMin": 5,
+          "poMax": 5,
+          "pa": 3,
+          "levelRequired": 63,
+          "critPct": 15,
+          "usesPerTurn": null,
+          "cooldown": 4,
+          "normal": [
+            "250 Puissance (3 tours)",
+            "250 Puissance (3 tours)",
+            "125 Puissance (3 tours)"
+          ],
+          "critical": [
+            "300 Puissance (3 tours)",
+            "300 Puissance (3 tours)",
+            "150 Puissance (3 tours)"
+          ]
+        },
+        {
+          "level": 6,
+          "poMin": 6,
+          "poMax": 6,
+          "pa": 3,
+          "levelRequired": 113,
+          "critPct": 15,
+          "usesPerTurn": null,
+          "cooldown": 4,
+          "normal": [
+            "350 Puissance (3 tours)",
+            "350 Puissance (3 tours)",
+            "175 Puissance (3 tours)"
+          ],
+          "critical": [
+            "400 Puissance (3 tours)",
+            "400 Puissance (3 tours)",
+            "200 Puissance (3 tours)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8121,
+      "name": "Concentration",
+      "description": "Inflige des dommages dans l’élément Terre. Les dégâts infligés sont plus importants sur les invocations. Attire le lanceur vers la cible de 1 case. Attire le lanceur vers la cible de 2 cases si elle est dans l'état Soufflé, posé par le sort Souffle.",
+      "maxLevel": 6,
+      "levels": [
+        {
+          "level": 1,
+          "poMin": 1,
+          "poMax": 3,
+          "pa": 2,
+          "levelRequired": 31,
+          "critPct": 5,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "12 à 16 (dommages Terre)",
+            "20 à 24 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ],
+          "critical": [
+            "14 à 18 (dommages Terre)",
+            "22 à 26 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ]
+        },
+        {
+          "level": 2,
+          "poMin": 1,
+          "poMax": 3,
+          "pa": 2,
+          "levelRequired": 31,
+          "critPct": 5,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "13 à 17 (dommages Terre)",
+            "21 à 25 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ],
+          "critical": [
+            "15 à 19 (dommages Terre)",
+            "23 à 27 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ]
+        },
+        {
+          "level": 3,
+          "poMin": 1,
+          "poMax": 3,
+          "pa": 2,
+          "levelRequired": 31,
+          "critPct": 5,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "14 à 18 (dommages Terre)",
+            "22 à 26 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ],
+          "critical": [
+            "16 à 20 (dommages Terre)",
+            "24 à 28 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ]
+        },
+        {
+          "level": 4,
+          "poMin": 1,
+          "poMax": 3,
+          "pa": 2,
+          "levelRequired": 31,
+          "critPct": 5,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "15 à 19 (dommages Terre)",
+            "23 à 27 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ],
+          "critical": [
+            "17 à 21 (dommages Terre)",
+            "25 à 29 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ]
+        },
+        {
+          "level": 5,
+          "poMin": 1,
+          "poMax": 4,
+          "pa": 2,
+          "levelRequired": 81,
+          "critPct": 5,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "16 à 20 (dommages Terre)",
+            "24 à 28 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ],
+          "critical": [
+            "18 à 22 (dommages Terre)",
+            "26 à 30 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ]
+        },
+        {
+          "level": 6,
+          "poMin": 1,
+          "poMax": 4,
+          "pa": 2,
+          "levelRequired": 131,
+          "critPct": 5,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "20 à 24 (dommages Terre)",
+            "30 à 34 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ],
+          "critical": [
+            "22 à 26 (dommages Terre)",
+            "32 à 36 (dommages Terre)",
+            "Avance de 1 case(s)",
+            "Avance de 2 case(s)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8127,
+      "name": "Vitalité",
+      "description": "Augmente la Vitalité et octroie l'état Vitalité pendant 2 tours. Cet état ne peut être posé que sur le lanceur. Sous l'état Vitalité, les dommages des sorts Épée Destructrice, Pression et Tourmente deviennent du vol de vie. Ne fonctionne pas sur les autres iops.",
+      "maxLevel": 6,
+      "levels": [
+        {
+          "level": 1,
+          "poMin": 1,
+          "poMax": 1,
+          "pa": 2,
+          "levelRequired": 37,
+          "critPct": 5,
+          "usesPerTurn": null,
+          "cooldown": 7,
+          "normal": [
+            "État 'Vitalité' (2 tours)",
+            "10% Vitalité (2 tours)",
+            "10% Vitalité (2 tours)"
+          ],
+          "critical": [
+            "État 'Vitalité' (2 tours)",
+            "12% Vitalité (2 tours)",
+            "12% Vitalité (2 tours)"
+          ]
+        },
+        {
+          "level": 2,
+          "poMin": 2,
+          "poMax": 2,
+          "pa": 2,
+          "levelRequired": 37,
+          "critPct": 5,
+          "usesPerTurn": null,
+          "cooldown": 6,
+          "normal": [
+            "État 'Vitalité' (2 tours)",
+            "10% Vitalité (2 tours)",
+            "10% Vitalité (2 tours)"
+          ],
+          "critical": [
+            "État 'Vitalité' (2 tours)",
+            "12% Vitalité (2 tours)",
+            "12% Vitalité (2 tours)"
+          ]
+        },
+        {
+          "level": 3,
+          "poMin": 3,
+          "poMax": 3,
+          "pa": 2,
+          "levelRequired": 37,
+          "critPct": 5,
+          "usesPerTurn": null,
+          "cooldown": 5,
+          "normal": [
+            "État 'Vitalité' (2 tours)",
+            "10% Vitalité (2 tours)",
+            "10% Vitalité (2 tours)"
+          ],
+          "critical": [
+            "État 'Vitalité' (2 tours)",
+            "12% Vitalité (2 tours)",
+            "12% Vitalité (2 tours)"
+          ]
+        },
+        {
+          "level": 4,
+          "poMin": 4,
+          "poMax": 4,
+          "pa": 2,
+          "levelRequired": 37,
+          "critPct": 5,
+          "usesPerTurn": null,
+          "cooldown": 4,
+          "normal": [
+            "État 'Vitalité' (2 tours)",
+            "10% Vitalité (2 tours)",
+            "10% Vitalité (2 tours)"
+          ],
+          "critical": [
+            "État 'Vitalité' (2 tours)",
+            "12% Vitalité (2 tours)",
+            "12% Vitalité (2 tours)"
+          ]
+        },
+        {
+          "level": 5,
+          "poMin": 5,
+          "poMax": 5,
+          "pa": 2,
+          "levelRequired": 87,
+          "critPct": 5,
+          "usesPerTurn": null,
+          "cooldown": 3,
+          "normal": [
+            "État 'Vitalité' (2 tours)",
+            "10% Vitalité (2 tours)",
+            "10% Vitalité (2 tours)"
+          ],
+          "critical": [
+            "État 'Vitalité' (2 tours)",
+            "12% Vitalité (2 tours)",
+            "12% Vitalité (2 tours)"
+          ]
+        },
+        {
+          "level": 6,
+          "poMin": 6,
+          "poMax": 6,
+          "pa": 2,
+          "levelRequired": 137,
+          "critPct": 5,
+          "usesPerTurn": null,
+          "cooldown": 3,
+          "normal": [
+            "État 'Vitalité' (2 tours)",
+            "15% Vitalité (2 tours)",
+            "15% Vitalité (2 tours)"
+          ],
+          "critical": [
+            "État 'Vitalité' (2 tours)",
+            "17% Vitalité (2 tours)",
+            "17% Vitalité (2 tours)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8133,
+      "name": "Intimidation",
+      "description": "Occasionne des dommages dans le meilleur élément et repousse la cible.",
+      "maxLevel": 6,
+      "levels": [
+        {
+          "level": 1,
+          "poMin": 1,
+          "poMax": 2,
+          "pa": 2,
+          "levelRequired": 43,
+          "critPct": 5,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "3 à 4 (meilleur élément)",
+            "Repousse de 1 case(s)"
+          ],
+          "critical": [
+            "4 à 5 (meilleur élément)",
+            "Repousse de 1 case(s)"
+          ]
+        },
+        {
+          "level": 2,
+          "poMin": 1,
+          "poMax": 2,
+          "pa": 2,
+          "levelRequired": 43,
+          "critPct": 5,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "4 à 5 (meilleur élément)",
+            "Repousse de 1 case(s)"
+          ],
+          "critical": [
+            "5 à 6 (meilleur élément)",
+            "Repousse de 1 case(s)"
+          ]
+        },
+        {
+          "level": 3,
+          "poMin": 1,
+          "poMax": 2,
+          "pa": 2,
+          "levelRequired": 43,
+          "critPct": 5,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "5 à 6 (meilleur élément)",
+            "Repousse de 1 case(s)"
+          ],
+          "critical": [
+            "6 à 7 (meilleur élément)",
+            "Repousse de 1 case(s)"
+          ]
+        },
+        {
+          "level": 4,
+          "poMin": 1,
+          "poMax": 2,
+          "pa": 2,
+          "levelRequired": 43,
+          "critPct": 5,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "6 à 7 (meilleur élément)",
+            "Repousse de 2 case(s)"
+          ],
+          "critical": [
+            "7 à 8 (meilleur élément)",
+            "Repousse de 2 case(s)"
+          ]
+        },
+        {
+          "level": 5,
+          "poMin": 1,
+          "poMax": 2,
+          "pa": 2,
+          "levelRequired": 93,
+          "critPct": 5,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "7 à 8 (meilleur élément)",
+            "Repousse de 2 case(s)"
+          ],
+          "critical": [
+            "8 à 9 (meilleur élément)",
+            "Repousse de 2 case(s)"
+          ]
+        },
+        {
+          "level": 6,
+          "poMin": 1,
+          "poMax": 2,
+          "pa": 2,
+          "levelRequired": 143,
+          "critPct": 5,
+          "usesPerTurn": 3,
+          "cooldown": null,
+          "normal": [
+            "10 à 12 (meilleur élément)",
+            "Repousse de 2 case(s)"
+          ],
+          "critical": [
+            "12 à 14 (meilleur élément)",
+            "Repousse de 2 case(s)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8295,
+      "name": "Epée de Iop",
+      "description": "Occasionne des dommages Terre en croix.",
+      "maxLevel": 6,
+      "levels": [
+        {
+          "level": 1,
+          "poMin": 1,
+          "poMax": 5,
+          "pa": 4,
+          "levelRequired": 67,
+          "critPct": 20,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "24 à 28 (dommages Terre)"
+          ],
+          "critical": [
+            "27 à 31 (dommages Terre)"
+          ]
+        },
+        {
+          "level": 2,
+          "poMin": 1,
+          "poMax": 5,
+          "pa": 4,
+          "levelRequired": 67,
+          "critPct": 20,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "25 à 29 (dommages Terre)"
+          ],
+          "critical": [
+            "28 à 32 (dommages Terre)"
+          ]
+        },
+        {
+          "level": 3,
+          "poMin": 1,
+          "poMax": 5,
+          "pa": 4,
+          "levelRequired": 67,
+          "critPct": 20,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "26 à 30 (dommages Terre)"
+          ],
+          "critical": [
+            "29 à 33 (dommages Terre)"
+          ]
+        },
+        {
+          "level": 4,
+          "poMin": 1,
+          "poMax": 5,
+          "pa": 4,
+          "levelRequired": 67,
+          "critPct": 20,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "27 à 31 (dommages Terre)"
+          ],
+          "critical": [
+            "30 à 34 (dommages Terre)"
+          ]
+        },
+        {
+          "level": 5,
+          "poMin": 1,
+          "poMax": 5,
+          "pa": 4,
+          "levelRequired": 117,
+          "critPct": 20,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "31 à 35 (dommages Terre)"
+          ],
+          "critical": [
+            "34 à 38 (dommages Terre)"
+          ]
+        },
+        {
+          "level": 6,
+          "poMin": 1,
+          "poMax": 6,
+          "pa": 4,
+          "levelRequired": 167,
+          "critPct": 20,
+          "usesPerTurn": 2,
+          "cooldown": null,
+          "normal": [
+            "35 à 39 (dommages Terre)"
+          ],
+          "critical": [
+            "40 à 44 (dommages Terre)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 410,
+      "name": "Brokle",
+      "description": "Les sorts qui touchent la cible effectueront toujours la valeur la plus élevée possible. L'effet s'applique aux sorts reçus par la cible, et non à ceux effectués par cette dernière. Lorsque la cible reçoit des dommages de sorts, elle subit à nouveau 20% des dommages reçus et les occasionne également en zone, aux alliés comme aux ennemis.",
+      "maxLevel": 6,
+      "levels": [
+        {
+          "level": 1,
+          "poMin": 3,
+          "poMax": 3,
+          "pa": 3,
+          "levelRequired": 73,
+          "critPct": null,
+          "usesPerTurn": null,
+          "cooldown": 10,
+          "normal": [
+            "Maximise les effets aléatoires (2 tours)",
+            "Putsch"
+          ],
+          "critical": []
+        },
+        {
+          "level": 2,
+          "poMin": 3,
+          "poMax": 3,
+          "pa": 3,
+          "levelRequired": 73,
+          "critPct": null,
+          "usesPerTurn": null,
+          "cooldown": 9,
+          "normal": [
+            "Maximise les effets aléatoires (2 tours)",
+            "Putsch"
+          ],
+          "critical": []
+        },
+        {
+          "level": 3,
+          "poMin": 4,
+          "poMax": 4,
+          "pa": 3,
+          "levelRequired": 73,
+          "critPct": null,
+          "usesPerTurn": null,
+          "cooldown": 8,
+          "normal": [
+            "Maximise les effets aléatoires (2 tours)",
+            "Putsch"
+          ],
+          "critical": []
+        },
+        {
+          "level": 4,
+          "poMin": 4,
+          "poMax": 4,
+          "pa": 3,
+          "levelRequired": 73,
+          "critPct": null,
+          "usesPerTurn": null,
+          "cooldown": 7,
+          "normal": [
+            "Maximise les effets aléatoires (2 tours)",
+            "Putsch"
+          ],
+          "critical": []
+        },
+        {
+          "level": 5,
+          "poMin": 5,
+          "poMax": 5,
+          "pa": 3,
+          "levelRequired": 123,
+          "critPct": null,
+          "usesPerTurn": null,
+          "cooldown": 6,
+          "normal": [
+            "Maximise les effets aléatoires (2 tours)",
+            "Putsch"
+          ],
+          "critical": []
+        },
+        {
+          "level": 6,
+          "poMin": 5,
+          "poMax": 5,
+          "pa": 3,
+          "levelRequired": 173,
+          "critPct": null,
+          "usesPerTurn": null,
+          "cooldown": 5,
+          "normal": [
+            "Maximise les effets aléatoires (2 tours)",
+            "Putsch"
+          ],
+          "critical": []
+        }
+      ]
+    }
+  ]
+}

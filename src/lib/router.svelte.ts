@@ -24,6 +24,8 @@ const patterns: { pattern: string; name: string }[] = [
   { pattern: 'combats/historique', name: 'farmHistory' },
   { pattern: 'combats/masques', name: 'monstersHide' },
   { pattern: 'combats/:id', name: 'combatDetail' },
+  // Feature « Dégâts » (profils de stats, sorts, calcul — en construction).
+  { pattern: 'degats', name: 'degats' },
   { pattern: 'reglages', name: 'reglages' },
   { pattern: 'debug', name: 'debug' },
 ]
