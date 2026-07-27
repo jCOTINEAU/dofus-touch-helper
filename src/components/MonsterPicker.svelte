@@ -8,6 +8,7 @@
   import { getOrFetchMonster } from '../lib/fetch/monsterLoader'
   import { isEncyclopediaItemUrl } from '../lib/fetch/url'
   import { recentMonsters } from '../lib/stores/recentMonsters.svelte'
+  import { loadIndex, searchIndex, type IndexEntry } from '../lib/data/encyclopediaIndex'
   import type { CachedMonster } from '../lib/types'
   import ItemAvatar from './ItemAvatar.svelte'
 
@@ -19,9 +20,17 @@
   let { monsters, counts, onAdd }: Props = $props()
 
   let search = $state('')
-  let importingId = $state<number | null>(null)
+  // Plusieurs imports peuvent tourner en parallèle (un spinner par monstre).
+  let importing = $state<Set<number>>(new Set())
   let importUrl = $state('')
   let importError = $state('')
+
+  function markImporting(id: number, on: boolean) {
+    const next = new Set(importing)
+    if (on) next.add(id)
+    else next.delete(id)
+    importing = next
+  }
 
   const visible = $derived(monsters.filter((m) => !m.hidden))
   const byId = $derived(new Map(visible.map((m) => [m.id, m])))
@@ -47,18 +56,43 @@
     recentMonsters.ids.map((id) => byId.get(id)).filter((m): m is CachedMonster => !!m),
   )
 
+  // Recherche dans l'index complet (monstres pas encore connus localement),
+  // pour les importer à la volée.
+  let index = $state<IndexEntry[]>([])
+  $effect(() => {
+    loadIndex().then((e) => (index = e))
+  })
+  const indexResults = $derived.by(() => {
+    if (search.trim().length < 2) return []
+    return searchIndex(index, search, ['monstres'], 12).filter((e) => !byId.has(e.id))
+  })
+
+  async function importEntry(entry: IndexEntry) {
+    markImporting(entry.id, true)
+    importError = ''
+    try {
+      await getOrFetchMonster(entry.url)
+      recentMonsters.push(entry.id)
+      onAdd(entry.id, 1)
+    } catch (e) {
+      importError = `Import impossible (${String(e)})`
+    } finally {
+      markImporting(entry.id, false)
+    }
+  }
+
   async function tap(m: CachedMonster) {
     if (!m.imported) {
       // Frère : import à la volée avant de l'ajouter.
-      importingId = m.id
+      markImporting(m.id, true)
       try {
         await getOrFetchMonster(m.url)
       } catch (e) {
         importError = `Import impossible (${String(e)})`
-        importingId = null
+        markImporting(m.id, false)
         return
       }
-      importingId = null
+      markImporting(m.id, false)
     }
     recentMonsters.push(m.id)
     onAdd(m.id, 1)
@@ -87,9 +121,9 @@
         {count > 0 ? 'border-primary bg-primary/10' : 'border-base-300'}
         {m.imported ? '' : 'opacity-70'}"
       onclick={() => tap(m)}
-      disabled={importingId === m.id}
+      disabled={importing.has(m.id)}
     >
-      {#if importingId === m.id}
+      {#if importing.has(m.id)}
         <span class="loading loading-spinner loading-sm my-2"></span>
       {:else}
         <ItemAvatar imageUrl={m.imageUrl} name={m.name} size={36} />
@@ -142,6 +176,31 @@
       </div>
     </div>
   {/each}
+
+  {#if indexResults.length > 0}
+    <div>
+      <div class="text-xs font-semibold uppercase text-base-content/50">
+        Importer depuis l'encyclopédie
+      </div>
+      <div class="flex flex-col pt-1">
+        {#each indexResults as e (e.id)}
+          <button
+            class="flex items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-base-200"
+            onclick={() => importEntry(e)}
+            disabled={importing.has(e.id)}
+          >
+            {#if importing.has(e.id)}
+              <span class="loading loading-spinner loading-sm"></span>
+            {:else}
+              <span class="text-primary">↓</span>
+            {/if}
+            <span class="flex-1">{e.name}</span>
+            <span class="text-xs text-base-content/40">importer</span>
+          </button>
+        {/each}
+      </div>
+    </div>
+  {/if}
 
   <form class="flex gap-2 pt-1" onsubmit={importByUrl}>
     <input
